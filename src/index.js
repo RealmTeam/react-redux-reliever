@@ -1,5 +1,7 @@
 /* eslint-disable no-unused-vars */
 import {connect} from 'react-redux'
+import {mergeDeep} from './utils'
+
 
 class ReduxReliever {
 	ACTION_PREFIX = "(unset)"
@@ -31,8 +33,8 @@ class ReduxReliever {
 	reducer(state, action) {
 		if (state === undefined)
 			state = this.defaultState
-		if (action.type.startsWith(this.ACTION_PREFIX))
-			return {...state, ...action.payload}
+		if (action.type.startsWith(this.ACTION_PREFIX + "_"))
+			return mergeDeep(state, action.payload)
 		return state
 	}
 }

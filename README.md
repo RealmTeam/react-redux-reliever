@@ -6,7 +6,7 @@
 
 The principle is as follow : regroup all the logic from redux in a single file when you're developing new features while defaulting to certain behaviors to save you some time. You can easily override anything you don't like so you're not stuck either.
 
-It obviously uses [react]() and [redux]() but you can add [redux-saga]() for the handling of asynchronous tasks (you can fallback to [redux-thunk]() but learning to use redux-saga will result in better code).
+It obviously uses [react](https://github.com/facebook/react) and [redux](https://github.com/reactjs/redux) but you can add [redux-saga](https://github.com/redux-saga/redux-saga/) for the handling of asynchronous tasks (you can fallback to [redux-thunk](https://github.com/gaearon/redux-thunk) but learning to use redux-saga will result in better code).
 
 # Getting started
 
