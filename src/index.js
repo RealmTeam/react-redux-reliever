@@ -9,6 +9,14 @@ class ReduxReliever {
 	constructor(cls) {
 		this.cls = cls
 		this.container = this.connect()
+		this.container.prototype.updateStatePropsIfNeeded = function updateStatePropsIfNeeded() {
+			this.stateProps = this.computeStateProps(this.store, this.props)
+			return false
+		}
+		this.container.prototype.updateDispatchPropsIfNeeded = function updateDispatchPropsIfNeeded() {
+			this.dispatchProps = this.computeDispatchProps(this.store, this.props)
+			return false
+		}
 	}
 
 	connect() {
