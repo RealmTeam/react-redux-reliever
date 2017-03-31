@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import {connect} from 'react-redux'
+import connect from './connect'
 import {mergeDeep} from './utils'
 
 
@@ -9,21 +9,11 @@ class ReduxReliever {
 	constructor(cls) {
 		this.cls = cls
 		this.container = this.connect()
-		this.container.prototype.updateStatePropsIfNeeded = function updateStatePropsIfNeeded() {
-			this.stateProps = this.computeStateProps(this.store, this.props)
-			return false
-		}
-		this.container.prototype.updateDispatchPropsIfNeeded = function updateDispatchPropsIfNeeded() {
-			this.dispatchProps = this.computeDispatchProps(this.store, this.props)
-			return false
-		}
 	}
 
 	connect() {
 		return connect(
-			(state, ownProps) => state,
-			(dispatch, ownProps) => ({dispatch}),
-			(state, {dispatch}, ownProps) => ({
+			(state, dispatch, ownProps) => ({
 				...this.props(state, ownProps),
 				...this.functions(state, ownProps, dispatch)
 			})
