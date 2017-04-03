@@ -14,7 +14,8 @@ export default function shallowEqual(objA, objB) {
   const hasOwn = Object.prototype.hasOwnProperty
   for (let i = 0; i < keysA.length; i++) {
     if (!hasOwn.call(objB, keysA[i]) ||
-        objA[keysA[i]] !== objB[keysA[i]]) {
+        (typeof objA[keysA[i]] !== 'function' &&
+          objA[keysA[i]] !== objB[keysA[i]])) {
       return false
     }
   }

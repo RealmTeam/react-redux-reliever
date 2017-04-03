@@ -2101,7 +2101,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 22 */
 /***/ function(module, exports) {
 
-	"use strict";
+	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -2122,7 +2122,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // Test for A's keys different from B.
 	  var hasOwn = Object.prototype.hasOwnProperty;
 	  for (var i = 0; i < keysA.length; i++) {
-	    if (!hasOwn.call(objB, keysA[i]) || objA[keysA[i]] !== objB[keysA[i]]) {
+	    if (!hasOwn.call(objB, keysA[i]) || typeof objA[keysA[i]] !== 'function' && objA[keysA[i]] !== objB[keysA[i]]) {
 	      return false;
 	    }
 	  }
