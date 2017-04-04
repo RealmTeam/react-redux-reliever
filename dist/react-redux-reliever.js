@@ -2083,10 +2083,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return item && (typeof item === 'undefined' ? 'undefined' : _typeof(item)) === 'object' && !Array.isArray(item) && item !== null;
 	}
 
+	function isPlainObject(item) {
+	    return item !== null && (typeof item === 'undefined' ? 'undefined' : _typeof(item)) == 'object' && item.constructor == Object;
+	}
+
 	function mergeDeep(target, source) {
 	    if (isObject(target) && isObject(source)) {
 	        Object.keys(source).forEach(function (key) {
-	            if (isObject(source[key])) {
+	            if (isPlainObject(source[key])) {
 	                if (!target[key]) target = _extends({}, target, _defineProperty({}, key, {}));
 	                target = _extends({}, target, _defineProperty({}, key, mergeDeep(target[key], source[key])));
 	            } else {
