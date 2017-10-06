@@ -1,6 +1,6 @@
 import {put, call, takeEvery} from 'redux-saga/effects'
 import {delay} from 'redux-saga'
-import ReduxReliever from 'react-redux-reliever'
+import ReduxReliever, {ReduxRelieverRegistry} from "react-redux-reliever"
 import Counter from '../components/Counter'
 
 
@@ -12,35 +12,42 @@ class CounterReduxReliever extends ReduxReliever {
     }
 
     props(state, ownProps) {
-        return {value: state.counter.value, ...ownProps}
+        return {value: ReduxRelieverRegistry.getModuleState(state, "counter").value, ...ownProps}
     }
 
     *incrementAsync(action) {
         yield call(delay, 1000)
-        yield put({type: 'COUNTER_INCREMENT'})
+        yield put(ReduxRelieverRegistry.getModuleActions("counter").increment())
     }
 
     *saga() {
         yield takeEvery('COUNTER_INCREMENT_ASYNC', this.incrementAsync)
     }
 
+    actions = {
+        increment: () => ({type: 'COUNTER_INCREMENT'}),
+        set: (v) => ({type: 'COUNTER_SET', payload: {value: v}}),
+        incrementAsync: () => ({type: 'COUNTER_INCREMENT_ASYNC'}),
+        decrement: () => ({type: 'COUNTER_DECREMENT'})
+    }
+
     functions(state, ownProps, dispatch) {
         return {
             incr: () => {
-                dispatch({type: 'COUNTER_INCREMENT'})
+                dispatch(this.actions.increment())
             },
             setToTen: () => {
-                dispatch({type: 'COUNTER_SET', payload: {value: 10}})
+                dispatch(this.actions.set(10))
             },
             incrAsync: () => {
-                dispatch({type: 'COUNTER_INCREMENT_ASYNC'})
+                dispatch(this.actions.incrementAsync())
             },
             incrIfOdd: () => {
                 if (state.counter.value % 2 !== 0)
-                    dispatch({type: 'COUNTER_INCREMENT'})
+                    dispatch(this.actions.increment())
             },
             decr: () => {
-                dispatch({type: 'COUNTER_DECREMENT'})
+                dispatch(this.actions.decrement())
             }
         }
     }
@@ -58,10 +65,4 @@ class CounterReduxReliever extends ReduxReliever {
 
 }
 
-const relievedCounter = new CounterReduxReliever(Counter)
-
-const CounterContainer = relievedCounter.container
-const CounterSaga = relievedCounter.saga.bind(relievedCounter)
-const CounterReducer = relievedCounter.reducer.bind(relievedCounter)
-
-export {CounterContainer as default, CounterSaga, CounterReducer}
+export default ReduxRelieverRegistry.register(CounterReduxReliever, Counter, "counter")

@@ -23,9 +23,9 @@ $ yarn add react-redux-reliever
 
 ## Usage Example
 
-First, import ReduxReliever
+First, import `ReduxReliever` and `ReduxRelieverRegistry`
 ```javascript
-import ReduxReliever from 'react-redux-reliever'
+import ReduxReliever, {ReduxRelieverRegistry} from 'react-redux-reliever'
 ```
 
 Then, import your component (presentational if you read redux doc)
@@ -54,7 +54,15 @@ The default state for the reducer
 `props` is exactly like `mapStateToProps` except that you also need to return `ownProps` (that way you are able to easily remove unwanted props)
 ```javascript
     props(state, ownProps) {
-        return {...state.whatever, ...ownProps}
+        return {...ReduxRelieverRegistry.getModuleState(state, "whatever"), ...ownProps}
+    }
+```
+
+`actions` is where you define actions that could be used by other containers (otherwise, simply use the payload)
+```javascript
+    actions = {
+        doSomething: () => ({type: 'WHATEVER_YOU_DO_ASYNC'}),
+        doSomethingElse: () => ({type: 'WHATEVER_YOU_LIKE'})
     }
 ```
 
@@ -63,6 +71,7 @@ The default state for the reducer
     *saga() {
         // Do whatever async tasks you want here.
         // You can define other generator methods and call them from here for organization's sake.
+        yield takeEvery('WHATEVER_YOU_DO_ASYNC', this.whateverAsync)
     }
 ```
 
@@ -72,12 +81,18 @@ This allows you to do checks or pass parameters based on the state without requi
     functions(state, ownProps, dispatch) {
         return {
             test: () => {
-                // Note that we don't use action creators (source of a lot of the pain when using redux).
-                // This is a choice and you can still use them if you want.
+                // Note that we generally don't use action creators (source of a lot of the pain when using redux).
+                // This is purely a choice and you can still use them if you want.
                 dispatch({type: 'WHATEVER_TEST', payload: {value: "Looking good !"}})
             },
             add: () => {
                 dispatch({type: 'WHATEVER_ADD'}})
+            },
+            doSomething: () => {
+                // If you want to use action creators, you could do so like that
+                dispatch(this.actions.doSomething())
+                // And if you need an action from another container you can do so by using its name
+                dispatch(ReduxRelieverRegistry.getModuleActions("example").doSomething())
             }
         }
     }
@@ -97,34 +112,33 @@ The most frequent case for a mixed reducer is something needing to be added to s
     }
 ```
 
-We instanciate our reliever with our component
+We can now instanciate our reliever and add it to the registry
 ```javascript
 }
 
-const relievedComponent = new ComponentReduxReliever(Component)
-```
- We then extract everything that needs to be exported (and bind every method needing `this`)
-```javascript
-const ComponentContainer = relievedComponent.container
-const ComponentSaga = relievedComponent.saga.bind(relievedComponent)
-const ComponentReducer = relievedComponent.reducer.bind(relievedComponent)
-
-export {ComponentContainer as default, ComponentSaga, ComponentReducer}
+export default ReduxRelieverRegistry.register(ComponentReduxReliever, Component, "whatever")
 ```
 
-We can then register everything like this
+We can then use the registry to create the rootReducer like so
 ```javascript
-import ComponentContainer, {ComponentSaga, ComponentReducer} from './containers/ComponentContainer'
+import {ReduxRelieverRegistry} from "react-redux-reliever"
 
-const rootReducer = combineReducers({
-    whatever: ComponentReducer
+// You can pass an object to include other reducers you may have
+// By default everything will be on the same level in your store but you can pass
+// an extra argument to put reducers from the registry on another level
+const rootReducer = ReduxRelieverRegistry.buildRootReducer({
+    otherReducer: myOtherReducer
+}, "customLevelInStore")
+```
+
+And the rootSaga if you're using saga
+```javascript
+// You can pass a generator function to include other sagas you may have
+const rootSaga = ReduxRelieverRegistry.buildRootSaga(function* myRootSaga() {
+    yield fork(customSaga)
 })
 
-function* rootSaga() {
-    yield fork(ComponentSaga)
-}
 const sagaMiddleware = createSagaMiddleware()
-
 const store = createStore(rootReducer, applyMiddleware(sagaMiddleware))
 
 sagaMiddleware.run(rootSaga)
