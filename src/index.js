@@ -3,13 +3,11 @@ import {mergeDeep} from './utils'
 import RelieverRegistry from './registry'
 
 class Reliever {
+	*saga() {}
+
 	ACTION_PREFIX = "(unset)"
 
-	constructor() {
-		this.actions = {}
-	}
-
-	*saga() {}
+	actions = {}
 
 	reducer(state, action) {
 		if (state === undefined)

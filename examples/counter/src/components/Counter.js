@@ -1,6 +1,6 @@
 /*eslint-disable no-unused-vars */
 import React from 'react'
-import {connect, moduleState, moduleActions} from "react-redux-reliever"
+import RelieverRegistry from "react-redux-reliever"
 
 const Counter = ({value, incr, incrAsync, decr, incrIfOdd, setToTen}) => (
     <p>
@@ -18,24 +18,24 @@ const Counter = ({value, incr, incrAsync, decr, incrIfOdd, setToTen}) => (
     </p>
 )
 
-export default connect({
-    props: (state, ownProps) => ({value: moduleState("counter", state).value, ...ownProps}),
-    functions(state, ownProps, dispatch) => ({
+export default RelieverRegistry.connect({
+    props: (state, ownProps) => ({value: RelieverRegistry.moduleState("counter", state).value, ...ownProps}),
+    functions: (state, ownProps, dispatch) => ({
         incr: () => {
-            dispatch(moduleActions("counter").increment())
+            dispatch(RelieverRegistry.moduleActions("counter").increment())
         },
         setToTen: () => {
-            dispatch(moduleActions("counter").set(10))
+            dispatch(RelieverRegistry.moduleActions("counter").set(10))
         },
         incrAsync: () => {
-            dispatch(moduleActions("counter").incrementAsync())
+            dispatch(RelieverRegistry.moduleActions("counter").incrementAsync())
         },
         incrIfOdd: () => {
             if (state.counter.value % 2 !== 0)
-                dispatch(moduleActions("counter").increment())
+                dispatch(RelieverRegistry.moduleActions("counter").increment())
         },
         decr: () => {
-            dispatch(moduleActions("counter").decrement())
+            dispatch(RelieverRegistry.moduleActions("counter").decrement())
         }
     })
 })(Counter)

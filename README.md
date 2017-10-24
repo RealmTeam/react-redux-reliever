@@ -25,7 +25,7 @@ $ yarn add react-redux-reliever
 
 First, import `Reliever` and `register`
 ```javascript
-import {Reliever, register} from 'react-redux-reliever'
+import RelieverRegistry, {Reliever} from 'react-redux-reliever'
 ```
 
 Create a class that extends `Reliever`
@@ -75,19 +75,22 @@ The most frequent case for a mixed reducer is something needing to be added to s
                 return super.reducer(state, action)
         }
     }
-```
-
-We can now instanciate our reliever and add it to the registry
-```javascript
 }
 
-export default register(ComponentReliever, "whatever")
+export default ComponentReliever
+```
+
+Now in your store file
+```javascript
+import RelieverRegistry from "react-redux-reliever"
+```
+We can register our reliever to the registry
+```javascript
+RelieverRegistry.register(ComponentReliever, "whatever")
 ```
 
 We can then use the registry to create the rootReducer like so
 ```javascript
-import RelieverRegistry from "react-redux-reliever"
-
 // You can pass an object to include other reducers you may have
 // By default everything will be on the same level in your store but you can pass
 // an extra argument to put reducers from the registry on another level
@@ -114,7 +117,7 @@ Now you can connect your component to the store.
 You can choose to do it the usual way or you can use the `connect` function of the registry.
 In your `Component.js`, we import the necessary functions
 ```javascript
-import {connect, moduleState, moduleActions} from "react-redux-reliever"
+import RelieverRegistry from "react-redux-reliever"
 ```
 
 The connect function takes two named parameters : `props` and `functions`
@@ -123,7 +126,7 @@ The connect function takes two named parameters : `props` and `functions`
 ```javascript
     props(state, ownProps) {
         // moduleState is used to retrieve the module's state in the whole store
-        return {...moduleState("whatever", state), ...ownProps}
+        return {...RelieverRegistry.moduleState("whatever", state), ...ownProps}
     }
 ```
 
@@ -139,7 +142,7 @@ This allows you to do checks or pass parameters based on the state without requi
             },
             doSomething: () => {
                 // If you want to use action creators from a module, you could do so like that by using its name
-                dispatch(moduleActions("whatever").doSomething())
+                dispatch(RelieverRegistry.moduleActions("whatever").doSomething())
             }
         }
     }
@@ -147,7 +150,7 @@ This allows you to do checks or pass parameters based on the state without requi
 
 In the end, `connect` is used like that
 ```javascript
-export default connect({
+export default RelieverRegistry.connect({
     props: (state, ownProps) => {/* Your code here */},
     functions: (state, ownProps, dispatch) => {/* Your code here */}
 })(Component)

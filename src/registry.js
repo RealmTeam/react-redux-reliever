@@ -52,7 +52,7 @@ class RelieverRegistry {
         }
     }
 
-    connect(cls, {props, functions}) {
+    connect({props, functions}) {
         if (!props)
             props = (state, ownProps) => ownProps
         if (!functions)
@@ -62,7 +62,7 @@ class RelieverRegistry {
                 ...props(state, ownProps),
                 ...functions(state, ownProps, dispatch)
             })
-        )(cls)
+        )
     }
 
     moduleState(moduleName, state) {
