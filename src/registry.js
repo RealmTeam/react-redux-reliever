@@ -1,30 +1,28 @@
 import {combineReducers} from "redux"
 import {all, fork} from "redux-saga/effects"
+import connect from './connect'
 
 
-
-class ReduxRelieverRegistry {
+class RelieverRegistry {
     constructor() {
-        if (!ReduxRelieverRegistry.instance) {
+        if (!RelieverRegistry.instance) {
             this.modules = {}
             this.modulesRootReducerKey = undefined
             this.reducerConstructed = false
-            ReduxRelieverRegistry.instance = this
+            RelieverRegistry.instance = this
         }
-        return ReduxRelieverRegistry.instance
+        return RelieverRegistry.instance
     }
 
-    register(reliever, presentational, moduleName, {reducerKey} = {}) {
+    register(reliever, moduleName, {reducerKey} = {}) {
         if (this.reducerConstructed)
             console.warn("You are registering a new module but the modules reducer has already been built. This should not happen.")
-        const relievedComponent = new reliever(presentational)
-        const container = relievedComponent.container
+        const relievedComponent = new reliever()
         const saga = relievedComponent.saga.bind(relievedComponent)
         const reducer = relievedComponent.reducer.bind(relievedComponent)
         const actions = relievedComponent.actions
         reducerKey = reducerKey || moduleName
-        this.modules[moduleName] = {container, saga, reducer, reducerKey, actions}
-        return container
+        this.modules[moduleName] = {saga, reducer, reducerKey, actions}
     }
 
     changeModuleReducerKey(moduleName, reducerKey) {
@@ -45,16 +43,6 @@ class ReduxRelieverRegistry {
         return combineReducers({...moduleReducers, ...rootReducer})
     }
 
-    getModuleState(state, moduleName) {
-        if (this.modulesRootReducerKey)
-            return state[this.modulesRootReducerKey][this.modules[moduleName].reducerKey]
-        return state[this.modules[moduleName].reducerKey]
-    }
-
-    getModuleActions(moduleName) {
-        return this.modules[moduleName].actions
-    }
-
     buildRootSaga(rootSaga) {
         let moduleSagas = Object.values(this.modules).map(v => v.saga())
         return function* () {
@@ -63,6 +51,29 @@ class ReduxRelieverRegistry {
             yield all(moduleSagas)
         }
     }
+
+    connect(cls, {props, functions}) {
+        if (!props)
+            props = (state, ownProps) => ownProps
+        if (!functions)
+            functions = () => ({})
+        return connect(
+            (state, dispatch, ownProps) => ({
+                ...props(state, ownProps),
+                ...functions(state, ownProps, dispatch)
+            })
+        )(cls)
+    }
+
+    moduleState(moduleName, state) {
+        if (this.modulesRootReducerKey)
+            return state[this.modulesRootReducerKey][this.modules[moduleName].reducerKey]
+        return state[this.modules[moduleName].reducerKey]
+    }
+
+    moduleActions(moduleName) {
+        return this.modules[moduleName].actions
+    }
 }
 
-export default new ReduxRelieverRegistry()
+export default new RelieverRegistry()

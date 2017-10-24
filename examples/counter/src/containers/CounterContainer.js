@@ -1,18 +1,13 @@
 import {put, call, takeEvery} from 'redux-saga/effects'
 import {delay} from 'redux-saga'
-import ReduxReliever, {ReduxRelieverRegistry} from "react-redux-reliever"
-import Counter from '../components/Counter'
+import {Reliever, register} from "react-redux-reliever"
 
 
-class CounterReduxReliever extends ReduxReliever {
+class CounterReliever extends Reliever {
     ACTION_PREFIX = 'COUNTER'
 
     defaultState = {
         value: 0
-    }
-
-    props(state, ownProps) {
-        return {value: ReduxRelieverRegistry.getModuleState(state, "counter").value, ...ownProps}
     }
 
     *incrementAsync(action) {
@@ -31,27 +26,6 @@ class CounterReduxReliever extends ReduxReliever {
         decrement: () => ({type: 'COUNTER_DECREMENT'})
     }
 
-    functions(state, ownProps, dispatch) {
-        return {
-            incr: () => {
-                dispatch(this.actions.increment())
-            },
-            setToTen: () => {
-                dispatch(this.actions.set(10))
-            },
-            incrAsync: () => {
-                dispatch(this.actions.incrementAsync())
-            },
-            incrIfOdd: () => {
-                if (state.counter.value % 2 !== 0)
-                    dispatch(this.actions.increment())
-            },
-            decr: () => {
-                dispatch(this.actions.decrement())
-            }
-        }
-    }
-
     reducer(state, action) {
         switch (action.type) {
             case 'COUNTER_INCREMENT':
@@ -62,7 +36,6 @@ class CounterReduxReliever extends ReduxReliever {
                 return super.reducer(state, action)
         }
     }
-
 }
 
-export default ReduxRelieverRegistry.register(CounterReduxReliever, Counter, "counter")
+export default register(CounterReliever, "counter")

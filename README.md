@@ -23,19 +23,14 @@ $ yarn add react-redux-reliever
 
 ## Usage Example
 
-First, import `ReduxReliever` and `ReduxRelieverRegistry`
+First, import `Reliever` and `register`
 ```javascript
-import ReduxReliever, {ReduxRelieverRegistry} from 'react-redux-reliever'
+import {Reliever, register} from 'react-redux-reliever'
 ```
 
-Then, import your component (presentational if you read redux doc)
+Create a class that extends `Reliever`
 ```javascript
-import Component from '../components/Component'
-```
-
-Create a class that extends `ReduxReliever`
-```javascript
-class ComponentReduxReliever extends ReduxReliever {
+class ComponentReliever extends Reliever {
 ```
 
 `ACTION_PREFIX` is used if you want to use the default behavior for the reducer which is to check if the action type starts with this prefix and merges the action payload (`action.payload = {}`) with the state if that's the case.  
@@ -48,13 +43,6 @@ The default state for the reducer
 ```javascript
     defaultState = {
         value: null
-    }
-```
-
-`props` is exactly like `mapStateToProps` except that you also need to return `ownProps` (that way you are able to easily remove unwanted props)
-```javascript
-    props(state, ownProps) {
-        return {...ReduxRelieverRegistry.getModuleState(state, "whatever"), ...ownProps}
     }
 ```
 
@@ -72,29 +60,6 @@ The default state for the reducer
         // Do whatever async tasks you want here.
         // You can define other generator methods and call them from here for organization's sake.
         yield takeEvery('WHATEVER_YOU_DO_ASYNC', this.whateverAsync)
-    }
-```
-
-`functions` is the same as `mapDispatchToProps` except that you have access to the whole state instead of the component's props.  
-This allows you to do checks or pass parameters based on the state without requiring to add them as props.
-```javascript
-    functions(state, ownProps, dispatch) {
-        return {
-            test: () => {
-                // Note that we generally don't use action creators (source of a lot of the pain when using redux).
-                // This is purely a choice and you can still use them if you want.
-                dispatch({type: 'WHATEVER_TEST', payload: {value: "Looking good !"}})
-            },
-            add: () => {
-                dispatch({type: 'WHATEVER_ADD'}})
-            },
-            doSomething: () => {
-                // If you want to use action creators, you could do so like that
-                dispatch(this.actions.doSomething())
-                // And if you need an action from another container you can do so by using its name
-                dispatch(ReduxRelieverRegistry.getModuleActions("example").doSomething())
-            }
-        }
     }
 ```
 
@@ -116,17 +81,17 @@ We can now instanciate our reliever and add it to the registry
 ```javascript
 }
 
-export default ReduxRelieverRegistry.register(ComponentReduxReliever, Component, "whatever")
+export default register(ComponentReliever, "whatever")
 ```
 
 We can then use the registry to create the rootReducer like so
 ```javascript
-import {ReduxRelieverRegistry} from "react-redux-reliever"
+import RelieverRegistry from "react-redux-reliever"
 
 // You can pass an object to include other reducers you may have
 // By default everything will be on the same level in your store but you can pass
 // an extra argument to put reducers from the registry on another level
-const rootReducer = ReduxRelieverRegistry.buildRootReducer({
+const rootReducer = RelieverRegistry.buildRootReducer({
     otherReducer: myOtherReducer
 }, "customLevelInStore")
 ```
@@ -134,7 +99,7 @@ const rootReducer = ReduxRelieverRegistry.buildRootReducer({
 And the rootSaga if you're using saga
 ```javascript
 // You can pass a generator function to include other sagas you may have
-const rootSaga = ReduxRelieverRegistry.buildRootSaga(function* myRootSaga() {
+const rootSaga = RelieverRegistry.buildRootSaga(function* myRootSaga() {
     yield fork(customSaga)
 })
 
@@ -142,6 +107,50 @@ const sagaMiddleware = createSagaMiddleware()
 const store = createStore(rootReducer, applyMiddleware(sagaMiddleware))
 
 sagaMiddleware.run(rootSaga)
+```
+
+Now you can connect your component to the store.  
+
+You can choose to do it the usual way or you can use the `connect` function of the registry.
+In your `Component.js`, we import the necessary functions
+```javascript
+import {connect, moduleState, moduleActions} from "react-redux-reliever"
+```
+
+The connect function takes two named parameters : `props` and `functions`
+
+`props` is exactly like `mapStateToProps` except that you also need to return `ownProps` (that way you are able to easily remove unwanted props)
+```javascript
+    props(state, ownProps) {
+        // moduleState is used to retrieve the module's state in the whole store
+        return {...moduleState("whatever", state), ...ownProps}
+    }
+```
+
+`functions` is the same as `mapDispatchToProps` except that you have access to the whole state instead of the component's props.  
+This allows you to do checks or pass parameters based on the state without requiring to add them as props.
+```javascript
+    functions(state, ownProps, dispatch) {
+        return {
+            test: () => {
+                // Note that we generally don't use action creators.
+                // This is purely a choice and you can still use them if you want.
+                dispatch({type: 'WHATEVER_TEST', payload: {value: "Looking good !"}})
+            },
+            doSomething: () => {
+                // If you want to use action creators from a module, you could do so like that by using its name
+                dispatch(moduleActions("whatever").doSomething())
+            }
+        }
+    }
+```
+
+In the end, `connect` is used like that
+```javascript
+export default connect({
+    props: (state, ownProps) => {/* Your code here */},
+    functions: (state, ownProps, dispatch) => {/* Your code here */}
+})(Component)
 ```
 
 That's it !

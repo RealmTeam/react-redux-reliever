@@ -1,35 +1,15 @@
 /* eslint-disable no-unused-vars */
-import connect from './connect'
 import {mergeDeep} from './utils'
-import ReduxRelieverRegistry from './registry'
+import RelieverRegistry from './registry'
 
-class ReduxReliever {
+class Reliever {
 	ACTION_PREFIX = "(unset)"
 
-	constructor(cls) {
-		this.cls = cls
+	constructor() {
 		this.actions = {}
-		this.container = this.connect()
-	}
-
-	connect() {
-		return connect(
-			(state, dispatch, ownProps) => ({
-				...this.props(state, ownProps),
-				...this.functions(state, ownProps, dispatch)
-			})
-		)(this.cls)
-	}
-
-	props(state, ownProps) {
-		return ownProps
 	}
 
 	*saga() {}
-
-	functions(state, ownProps, dispatch) {
-		return {}
-	}
 
 	reducer(state, action) {
 		if (state === undefined)
@@ -40,4 +20,4 @@ class ReduxReliever {
 	}
 }
 
-export {ReduxReliever as default, ReduxRelieverRegistry}
+export {Reliever, RelieverRegistry as default}
