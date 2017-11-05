@@ -39,18 +39,12 @@ Leave it out if you don't wish to use the default behavior.
     ACTION_PREFIX = 'WHATEVER'
 ```
 
-The default state for the reducer
+The initial state for the reducer. Note that it will be transformed to an [ImmutableJS](https://facebook.github.io/immutable-js/) object.
 ```javascript
-    defaultState = {
-        value: null
-    }
-```
-
-`actions` is where you define actions that could be used by other containers (otherwise, simply use the payload)
-```javascript
-    actions = {
-        doSomething: () => ({type: 'WHATEVER_YOU_DO_ASYNC'}),
-        doSomethingElse: () => ({type: 'WHATEVER_YOU_LIKE'})
+    getInitialState() {
+        return {
+            value: null
+        }
     }
 ```
 
@@ -63,13 +57,24 @@ The default state for the reducer
     }
 ```
 
+`getActions` is where you define actions that could be used by other containers (otherwise, simply use the payload)
+```javascript
+    getActions() {
+        return {
+            doSomething: () => ({type: 'WHATEVER_YOU_DO_ASYNC'}),
+            doSomethingElse: () => ({type: 'WHATEVER_YOU_LIKE'})         
+        }
+    }
+```
+
 The reducer is not required but you can still override it. Here we have a mix between the default `react-redux-reliever` behavior and the standard `redux` behavior.  
+Don't forget that the state is an [ImmutableJS](https://facebook.github.io/immutable-js/) object.  
 The most frequent case for a mixed reducer is something needing to be added to some value in the state.
 ```javascript
     reducer(state, action) {
         switch (action.type) {
             case 'WHATEVER_ADD':
-                return {value: state.value + "!"}
+                return state.set('value', state.get('value') + "!")
             default:
                 // Don't forget to call super
                 return super.reducer(state, action)
@@ -126,7 +131,7 @@ The connect function takes two named parameters : `props` and `functions`
 ```javascript
     props(state, ownProps) {
         // moduleState is used to retrieve the module's state in the whole store
-        return {...RelieverRegistry.moduleState("whatever", state), ...ownProps}
+        return {value: RelieverRegistry.moduleState("whatever", state).get('value'), ...ownProps}
     }
 ```
 

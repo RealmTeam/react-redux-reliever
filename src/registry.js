@@ -20,7 +20,7 @@ class RelieverRegistry {
         const relievedComponent = new reliever()
         const saga = relievedComponent.saga.bind(relievedComponent)
         const reducer = relievedComponent.reducer.bind(relievedComponent)
-        const actions = relievedComponent.actions
+        const actions = relievedComponent.getActions()
         reducerKey = reducerKey || moduleName
         this.modules[moduleName] = {saga, reducer, reducerKey, actions}
     }
@@ -47,7 +47,7 @@ class RelieverRegistry {
         let moduleSagas = Object.values(this.modules).map(v => v.saga())
         return function* () {
             if (rootSaga)
-                yield fork(rootSaga())
+                yield fork(rootSaga)
             yield all(moduleSagas)
         }
     }

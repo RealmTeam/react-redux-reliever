@@ -1,6 +1,6 @@
 {
   "name": "react-redux-reliever",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Stop opening four different files to code a simple feature when using redux",
   "main": "lib/index.js",
   "jsnext:main": "es/index.js",
@@ -33,8 +33,9 @@
   },
   "homepage": "https://github.com/PhilipGarnero/react-redux-reliever#readme",
   "dependencies": {
-    "react-redux": "^4.4.5",
-    "prop-types": "^15.5.7"
+    "immutable": "^3.8.2",
+    "prop-types": "^15.5.7",
+    "react-redux": "^4.4.5"
   },
   "peerDependencies": {},
   "devDependencies": {

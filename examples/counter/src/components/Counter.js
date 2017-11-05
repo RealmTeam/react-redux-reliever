@@ -19,7 +19,7 @@ const Counter = ({value, incr, incrAsync, decr, incrIfOdd, setToTen}) => (
 )
 
 export default RelieverRegistry.connect({
-    props: (state, ownProps) => ({value: RelieverRegistry.moduleState("counter", state).value, ...ownProps}),
+    props: (state, ownProps) => ({value: RelieverRegistry.moduleState("counter", state).get('value'), ...ownProps}),
     functions: (state, ownProps, dispatch) => ({
         incr: () => {
             dispatch(RelieverRegistry.moduleActions("counter").increment())
@@ -31,7 +31,7 @@ export default RelieverRegistry.connect({
             dispatch(RelieverRegistry.moduleActions("counter").incrementAsync())
         },
         incrIfOdd: () => {
-            if (state.counter.value % 2 !== 0)
+            if (state.counter.get('value') % 2 !== 0)
                 dispatch(RelieverRegistry.moduleActions("counter").increment())
         },
         decr: () => {

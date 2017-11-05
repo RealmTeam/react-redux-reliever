@@ -1,19 +1,26 @@
 /* eslint-disable no-unused-vars */
-import {mergeDeep} from './utils'
+import {fromJS} from 'immutable'
 import RelieverRegistry from './registry'
 
-class Reliever {
-	*saga() {}
 
+class Reliever {
 	ACTION_PREFIX = "(unset)"
 
-	actions = {}
+	getInitialState() {
+		return {}
+	}
+
+	getActions() {
+		return {}
+	}
+	
+	*saga() {}
 
 	reducer(state, action) {
 		if (state === undefined)
-			state = this.defaultState
+			state = fromJS(this.getInitialState())
 		if (action.type.startsWith(this.ACTION_PREFIX + "_"))
-			return mergeDeep(state, action.payload)
+			return state.mergeDeep(action.payload)
 		return state
 	}
 }
