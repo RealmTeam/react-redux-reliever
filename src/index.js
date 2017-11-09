@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import {fromJS} from 'immutable'
 import RelieverRegistry from './registry'
-
+import merger from './utils/merger'
 
 class Reliever {
 	ACTION_PREFIX = "(unset)"
@@ -20,7 +20,7 @@ class Reliever {
 		if (state === undefined)
 			state = fromJS(this.getInitialState())
 		if (action.type.startsWith(this.ACTION_PREFIX + "_"))
-			return state.mergeDeep(action.payload)
+			return merger(state, action.payload)
 		return state
 	}
 }
