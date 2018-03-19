@@ -66,10 +66,10 @@ Create your `epics` (see [redux-observable](https://github.com/redux-observable/
             .ofType('WHATEVER_ACTION_ASYNC')
             .flatMap(action => {
                 return Observable
-                    .fromPromise(async () => {
+                    .fromPromise((async () => {
                         const result = await fetch(`https://some-api/foo?userId=${action.userId}`)
                         return await result.json()
-                    })
+                    })())
                     .map(json => {
                         return {
                             type: 'WHATEVER_USER_DATA_FETCHED',
