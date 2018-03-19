@@ -86,7 +86,25 @@ Create your `epics` (see [redux-observable](https://github.com/redux-observable/
 ```javascript
     Observable.getStore() // store observable, triggers once upon subscription
     Observable.getState() // state observable, triggers once upon subscription
+    Observable.getState('substate') // substate observable, triggers once upon subscription
     Observable.observeState() // state observable, triggers when the state changes
+    Observable.observeState('substate') // substate observable, triggers when the state changes
+```
+
+This allows you to build complex sequences of actions while leveraging the flexibility and operators of [rxjs](https://github.com/reactivex/rxjs)
+
+```javascript
+    fooEpic(action$) {
+        const shouldStop$ = Observable.observeState('substate')
+            .map(state => state.toJS().someProp)
+            .filter(prop => prop === 'foo') // this observable will trigger when the property someProp === 'foo'
+            .take(1) // unsubscribe once the filter operator has triggered
+
+        return action$
+            .ofType('WHATEVER_FOO_ACTION')
+            .mapTo({type: 'WHATEVER_SOMETHING_ELSE'})
+            .takeUntil(shouldStop$)
+    }
 ```
 
 `getActions` is where you define actions that could be used by other containers (otherwise, simply use the payload)
