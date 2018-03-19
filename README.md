@@ -50,6 +50,10 @@ The initial state for the reducer. Note that it will be transformed to an [Immut
 
 Create your `epics` (see [redux-observable](https://github.com/redux-observable/redux-observable)). By default all methods that have a name ending with 'Epic' will be used. You may also override the `epics` method and return an array of epics at your convenience.
 ```javascript
+
+    import {Reliever} from 'react-redux-reliever'
+    import {Observable} from 'rx'
+
     someEpic(action$) {
         return action$
             .ofType('WHATEVER_ACTION') // takes every action of type 'WHATEVER_ACTION' from the action stream
@@ -76,6 +80,13 @@ Create your `epics` (see [redux-observable](https://github.com/redux-observable/
                     })
             })
     }
+```
+
+`react-redux-reliever` also extends `Observable` (see [rxjs](https://github.com/reactivex/rxjs)) to provide you with convenient methods to access and observe the `store` and `state`
+```javascript
+    Observable.getStore() // store observable, triggers once upon subscription
+    Observable.getState() // state observable, triggers once upon subscription
+    Observable.observeState() // state observable, triggers when the state changes
 ```
 
 `getActions` is where you define actions that could be used by other containers (otherwise, simply use the payload)
