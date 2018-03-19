@@ -48,7 +48,7 @@ The initial state for the reducer. Note that it will be transformed to an [Immut
     }
 ```
 
-create your `epics` (see [redux-observable](https://github.com/redux-observable/redux-observable)). By default all methods that have a name ending with 'Epic' will be used. You may also override the `epics` method and return an array of epics at your convenience.
+Create your `epics` (see [redux-observable](https://github.com/redux-observable/redux-observable)). By default all methods that have a name ending with 'Epic' will be used. You may also override the `epics` method and return an array of epics at your convenience.
 ```javascript
     someEpic(action$) {
         return action$
