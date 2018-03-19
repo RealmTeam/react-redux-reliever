@@ -52,7 +52,7 @@ Create your `epics` (see [redux-observable](https://github.com/redux-observable/
 ```javascript
 
     import {Reliever} from 'react-redux-reliever'
-    import {Observable} from 'rx'
+    import {Observable} from 'rxjs'
 
     someEpic(action$) {
         return action$
