@@ -1,41 +1,35 @@
 /*eslint-disable no-unused-vars */
 import React from 'react'
-import RelieverRegistry from "react-redux-reliever"
+import RelieverRegistry from 'react-redux-reliever'
 
-const Counter = ({value, incr, incrAsync, decr, incrIfOdd, setToTen}) => (
-    <p>
-        Clicked: {value} times
-        {' '}
-        <button onClick={incr}>+</button>
-        {' '}
-        <button onClick={decr}>-</button>
-        {' '}
-        <button onClick={incrIfOdd}>Increment if odd</button>
-        {' '}
-        <button onClick={incrAsync}>Increment async</button>
-        {' '}
-        <button onClick={setToTen}>Set to 10</button>
-    </p>
+const Counter = ({value, incr, incrAsync, decr, incrIfOdd, setToTen, startTimer, actionWithError}) => (
+  <p>
+    Clicked: {value} times <button onClick={incr}>+</button> <button onClick={decr}>-</button> <button onClick={incrIfOdd}>Increment if odd</button>{' '}
+    <button onClick={incrAsync}>Increment async</button> <button onClick={setToTen}>Set to 10</button>
+    <button onClick={startTimer}>Start timer</button>
+  </p>
 )
 
 export default RelieverRegistry.connect({
-    props: (state, ownProps) => ({value: RelieverRegistry.moduleState("counter", state).get('value'), ...ownProps}),
-    functions: (state, ownProps, dispatch) => ({
-        incr: () => {
-            dispatch(RelieverRegistry.moduleActions("counter").increment())
-        },
-        setToTen: () => {
-            dispatch(RelieverRegistry.moduleActions("counter").set(10))
-        },
-        incrAsync: () => {
-            dispatch(RelieverRegistry.moduleActions("counter").incrementAsync())
-        },
-        incrIfOdd: () => {
-            if (state.counter.get('value') % 2 !== 0)
-                dispatch(RelieverRegistry.moduleActions("counter").increment())
-        },
-        decr: () => {
-            dispatch(RelieverRegistry.moduleActions("counter").decrement())
-        }
-    })
+  props: (state, ownProps) => ({value: RelieverRegistry.moduleState('counter', state).get('value'), ...ownProps}),
+  functions: (state, ownProps, dispatch) => ({
+    startTimer: () => {
+      dispatch({type: 'COUNTER_START_TIMER'})
+    },
+    incr: () => {
+      dispatch(RelieverRegistry.moduleActions('counter').increment())
+    },
+    setToTen: () => {
+      dispatch(RelieverRegistry.moduleActions('counter').set(10))
+    },
+    incrAsync: () => {
+      dispatch(RelieverRegistry.moduleActions('counter').incrementAsync())
+    },
+    incrIfOdd: () => {
+      if (state.counter.get('value') % 2 !== 0) dispatch(RelieverRegistry.moduleActions('counter').increment())
+    },
+    decr: () => {
+      dispatch(RelieverRegistry.moduleActions('counter').decrement())
+    }
+  })
 })(Counter)

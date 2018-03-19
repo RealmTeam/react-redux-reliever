@@ -6,7 +6,7 @@
 
 The principle is as follow : regroup all the logic from redux in a single file when you're developing new features while defaulting to certain behaviors to save you some time. You can easily override anything you don't like so you're not stuck either.
 
-It obviously uses [react](https://github.com/facebook/react) and [redux](https://github.com/reactjs/redux) but you can add [redux-saga](https://github.com/redux-saga/redux-saga/) for the handling of asynchronous tasks (you can fallback to [redux-thunk](https://github.com/gaearon/redux-thunk) but learning to use redux-saga will result in better code).
+It obviously uses [react](https://github.com/facebook/react) and [redux](https://github.com/reactjs/redux) and relies on [redux-observable](https://github.com/redux-observable/redux-observable).
 
 # Getting started
 
@@ -50,10 +50,31 @@ The initial state for the reducer. Note that it will be transformed to an [Immut
 
 `saga` is the entrypoint for `redux-saga`
 ```javascript
-    *saga() {
-        // Do whatever async tasks you want here.
-        // You can define other generator methods and call them from here for organization's sake.
-        yield takeEvery('WHATEVER_YOU_DO_ASYNC', this.whateverAsync)
+    someEpic(action$) {
+        return action$
+            .ofType('WHATEVER_ACTION') // takes every action of type 'WHATEVER_ACTION' from the action stream
+            .mapTo({type: 'WHATEVER_UPDATE', payload: {value: 'foo'}}) // then maps the action to an action of type 'WHATEVER_UPDATE'. payload will be applied to the state automatically without using a reducer
+    }
+
+    // you can also easily handle async actions
+    someAsyncEpic(action$) {
+        return action$
+            .ofType('WHATEVER_ACTION_ASYNC')
+            .flatMap(action => {
+                return Observable
+                    .fromPromise(async () => {
+                        const result = await fetch(`https://some-api/foo?userId=${action.userId}`)
+                        return await result.json()
+                    })
+                    .map(json => {
+                        return {
+                            type: 'WHATEVER_USER_DATA_FETCHED',
+                            payload: {
+                                userData: json.foo
+                            }
+                        }
+                    })
+            })
     }
 ```
 
@@ -61,8 +82,8 @@ The initial state for the reducer. Note that it will be transformed to an [Immut
 ```javascript
     getActions() {
         return {
-            doSomething: () => ({type: 'WHATEVER_YOU_DO_ASYNC'}),
-            doSomethingElse: () => ({type: 'WHATEVER_YOU_LIKE'})         
+            doSomething: () => ({type: 'WHATEVER_ACTION'}),
+            doSomethingElse: () => ({type: 'WHATEVER_ACTION_ASYNC'})         
         }
     }
 ```
@@ -94,7 +115,7 @@ We can register our reliever to the registry
 RelieverRegistry.register(ComponentReliever, "whatever")
 ```
 
-We can then use the registry to create the rootReducer like so
+We can then use the registry to create the store and rootReducer like so
 ```javascript
 // You can pass an object to include other reducers you may have
 // By default everything will be on the same level in your store but you can pass
@@ -102,19 +123,9 @@ We can then use the registry to create the rootReducer like so
 const rootReducer = RelieverRegistry.buildRootReducer({
     otherReducer: myOtherReducer
 }, "customLevelInStore")
-```
 
-And the rootSaga if you're using saga
-```javascript
-// You can pass a generator function to include other sagas you may have
-const rootSaga = RelieverRegistry.buildRootSaga(function* myRootSaga() {
-    yield fork(customSaga)
-})
-
-const sagaMiddleware = createSagaMiddleware()
-const store = createStore(rootReducer, applyMiddleware(sagaMiddleware))
-
-sagaMiddleware.run(rootSaga)
+const store = createStore(RelieverRegistry.buildRootReducer(), applyMiddleware(RelieverRegistry.middleware(), logger))
+RelieverRegistry.setupStore(store)
 ```
 
 Now you can connect your component to the store.  
@@ -166,7 +177,7 @@ That's it !
 # Building examples from sources
 
 ```sh
-$ git clone https://github.com/PhilipGarnero/react-redux-reliever.git
+$ git clone https://github.com/aronse/react-redux-reliever.git
 $ cd react-redux-reliever
 $ npm install
 ```
