@@ -1,8 +1,6 @@
-/* eslint-disable no-unused-vars */
 import {fromJS} from 'immutable'
 import RelieverRegistry from './registry'
 import merger from './utils/merger'
-import {Observable} from './utils/rx'
 
 function getAllProperties(obj, p = []) {
   if (obj == null) return p
