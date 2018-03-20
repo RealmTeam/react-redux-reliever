@@ -6,7 +6,6 @@ import isPlainObject from 'lodash/isPlainObject'
 import hoistStatics from 'hoist-non-react-statics'
 import invariant from 'invariant'
 
-
 function getDisplayName(WrappedComponent) {
   return WrappedComponent.displayName || WrappedComponent.name || 'Component'
 }
@@ -14,7 +13,7 @@ function getDisplayName(WrappedComponent) {
 let nextVersion = 0
 
 export default function connect(mapProps, options = {}) {
-  const { pure = true, withRef = false } = options
+  const {pure = true, withRef = false} = options
 
   // Helps track hot reloading.
   const version = nextVersion++
@@ -24,10 +23,7 @@ export default function connect(mapProps, options = {}) {
 
     function checkStateShape(props) {
       if (!isPlainObject(props)) {
-        warning(
-          `props() and functions() in ${connectDisplayName} must return a plain object. ` +
-          `Instead received ${props}.`
-        )
+        warning(`props() and functions() in ${connectDisplayName} must return a plain object. ` + `Instead received ${props}.`)
       }
     }
 
@@ -41,15 +37,16 @@ export default function connect(mapProps, options = {}) {
         this.version = version
         this.store = props.store || context.store
 
-        invariant(this.store,
+        invariant(
+          this.store,
           `Could not find "store" in either the context or ` +
-          `props of "${connectDisplayName}". ` +
-          `Either wrap the root component in a <Provider>, ` +
-          `or explicitly pass "store" as a prop to "${connectDisplayName}".`
+            `props of "${connectDisplayName}". ` +
+            `Either wrap the root component in a <Provider>, ` +
+            `or explicitly pass "store" as a prop to "${connectDisplayName}".`
         )
 
         const storeState = this.store.getState()
-        this.state = { storeState }
+        this.state = {storeState}
         this.clearCache()
       }
 
@@ -66,8 +63,7 @@ export default function connect(mapProps, options = {}) {
 
       updatePropsIfNeeded() {
         const nextProps = this.computeProps(this.store, this.props)
-        if (this.computedProps && shallowEqual(nextProps, this.computedProps))
-          return false
+        if (this.computedProps && shallowEqual(nextProps, this.computedProps)) return false
         this.computedProps = nextProps
         return true
       }
@@ -124,31 +120,23 @@ export default function connect(mapProps, options = {}) {
         }
 
         this.hasStoreStateChanged = true
-        this.setState({ storeState })
+        this.setState({storeState})
       }
 
       getWrappedInstance() {
-        invariant(withRef,
-          `To access the wrapped instance, you need to specify ` +
-          `{ withRef: true } as the fourth argument of the connect() call.`
-        )
+        invariant(withRef, `To access the wrapped instance, you need to specify ` + `{ withRef: true } as the fourth argument of the connect() call.`)
 
         return this.refs.wrappedInstance
       }
 
       render() {
-        const {
-          haveOwnPropsChanged,
-          hasStoreStateChanged,
-          renderedElement
-        } = this
+        const {haveOwnPropsChanged, hasStoreStateChanged, renderedElement} = this
 
         this.haveOwnPropsChanged = false
         this.hasStoreStateChanged = false
 
         let shouldUpdateProps = true
-        if (pure && renderedElement)
-          shouldUpdateProps = hasStoreStateChanged || haveOwnPropsChanged
+        if (pure && renderedElement) shouldUpdateProps = hasStoreStateChanged || haveOwnPropsChanged
 
         let havePropsChanged = false
         if (shouldUpdateProps) {
@@ -167,9 +155,7 @@ export default function connect(mapProps, options = {}) {
             ref: 'wrappedInstance'
           })
         } else {
-          this.renderedElement = createElement(WrappedComponent,
-            this.computedProps
-          )
+          this.renderedElement = createElement(WrappedComponent, this.computedProps)
         }
 
         return this.renderedElement
