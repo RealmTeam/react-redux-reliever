@@ -90,6 +90,10 @@ Observable.prototype.debug = function(prefix) {
   )
 }
 
+Observable.prototype.toJS = function() {
+  return this.map(v => v.toJS())
+}
+
 Observable.combineToObject = obj => {
   return Observable.combineLatest(Object.keys(obj).map(k => obj[k]), (...args) => {
     return Object.keys(obj).reduce((parent, key, index) => {

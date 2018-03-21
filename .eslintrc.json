@@ -5,8 +5,12 @@
     "node": true,
     "es6": true
   },
+  "plugins": [
+    "redux-reliever"
+  ],
   "rules": {
-    "no-console": "off"
+    "no-console": "off",
+    "redux-reliever/enforce-oftype-usage": 2
   },
   "parser": "babel-eslint"
 }

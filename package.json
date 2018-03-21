@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "jsnext:main": "es/index.js",
   "scripts": {
-    "lint": "eslint src",
+    "lint": "lint src && lint examples",
     "check": "npm run lint",
     "compile": "rimraf lib && cross-env BABEL_ENV=cjs babel -d lib/ src/",
     "build:umd:dev": "cross-env BABEL_ENV=cjs webpack src/index.js dist/react-redux-reliever.js --config webpack.config.dev.js",
@@ -33,6 +33,7 @@
   },
   "homepage": "https://github.com/PhilipGarnero/react-redux-reliever#readme",
   "dependencies": {
+    "eslint-plugin-redux-reliever": "1.5.0",
     "immutable": "^3.8.2",
     "prop-types": "^15.5.7",
     "react-redux": "^4.4.5",
