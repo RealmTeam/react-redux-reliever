@@ -38,6 +38,7 @@
     "prop-types": "^15.5.7",
     "react-redux": "^4.4.5",
     "redux-observable": "^0.18.0",
+    "redux-saga": "^0.16.0",
     "rxjs": "^5.5.7"
   },
   "peerDependencies": {},
