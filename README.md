@@ -7,7 +7,8 @@
 
 The principle is as follow : regroup all the logic from redux in a single file when you're developing new features while defaulting to certain behaviors to save you some time. You can easily override anything you don't like so you're not stuck either.
 
-It obviously uses [react](https://github.com/facebook/react) and [redux](https://github.com/reactjs/redux) and relies on [redux-observable](https://github.com/redux-observable/redux-observable).
+It obviously uses [react](https://github.com/facebook/react) and [redux](https://github.com/reactjs/redux).
+
 
 # Getting started
 
@@ -20,6 +21,32 @@ or
 
 ```sh
 $ yarn add react-redux-reliever
+```
+
+## Plugins
+ * Rx: based on [redux-observable](https://github.com/redux-observable/redux-observable).
+ ```javascript
+    import RxRelieverPlugin from 'react-redux-reliever/plugins/rx'
+    import RelieverRegistry from 'react-redux-reliever'
+
+    RelieverRegistry.use(RxRelieverPlugin)
+ ```
+ * Saga: based on [redux-saga](https://github.com/redux-saga/redux-saga).
+ ```javascript
+    import SagaRelieverPlugin from 'react-redux-reliever/plugins/saga'
+    import RelieverRegistry from 'react-redux-reliever'
+
+    RelieverRegistry.use(SagaRelieverPlugin)
+ ```
+
+You may also create your own plugins using the following interface.
+```javascript
+	class SomePlugin {
+    		createMiddleware(reliever) {}
+	        setupStore(store) {}
+	}
+    
+    RelieverRegistry.use(SomePlugin)
 ```
 
 ## Usage Example
@@ -49,64 +76,6 @@ The initial state for the reducer. Note that it will be transformed to an [Immut
     }
 ```
 
-Create your `epics` (see [redux-observable](https://github.com/redux-observable/redux-observable)). By default all methods that have a name ending with 'Epic' will be used. You may also override the `epics` method and return an array of epics at your convenience.
-```javascript
-
-    import {Reliever} from 'react-redux-reliever'
-    import {Observable} from 'rxjs'
-
-    someEpic(action$) {
-        return action$
-            .ofType('WHATEVER_ACTION') // takes every action of type 'WHATEVER_ACTION' from the action stream
-            .mapTo({type: 'WHATEVER_UPDATE', payload: {value: 'foo'}}) // then maps the action to an action of type 'WHATEVER_UPDATE'. payload will be applied to the state automatically without using a reducer
-    }
-
-    // you can also easily handle async actions
-    someAsyncEpic(action$) {
-        return action$
-            .ofType('WHATEVER_ACTION_ASYNC')
-            .flatMap(action => {
-                return Observable
-                    .fromPromise((async () => {
-                        const result = await fetch(`https://some-api/foo?userId=${action.userId}`)
-                        return await result.json()
-                    })())
-                    .map(json => {
-                        return {
-                            type: 'WHATEVER_USER_DATA_FETCHED',
-                            payload: {
-                                userData: json.foo
-                            }
-                        }
-                    })
-            })
-    }
-```
-
-`react-redux-reliever` also extends `Observable` (see [rxjs](https://github.com/reactivex/rxjs)) to provide you with convenient methods to access and observe the `store` and `state`
-```javascript
-    Observable.getStore() // store observable, triggers once upon subscription
-    Observable.getState() // state observable, triggers once upon subscription
-    Observable.getState('substate') // substate observable, triggers once upon subscription
-    Observable.observeState() // state observable, triggers when the state changes
-    Observable.observeState('substate') // substate observable, triggers when the state changes
-```
-
-This allows you to build complex sequences of actions while leveraging the flexibility and operators of [rxjs](https://github.com/reactivex/rxjs)
-
-```javascript
-    fooEpic(action$) {
-        const shouldStop$ = Observable.observeState('substate')
-            .map(state => state.toJS().someProp)
-            .filter(prop => prop === 'foo') // this observable will trigger when the property someProp === 'foo'
-            .take(1) // unsubscribe once the filter operator has triggered
-
-        return action$
-            .ofType('WHATEVER_FOO_ACTION')
-            .mapTo({type: 'WHATEVER_SOMETHING_ELSE'})
-            .takeUntil(shouldStop$)
-    }
-```
 
 `getActions` is where you define actions that could be used by other containers (otherwise, simply use the payload)
 ```javascript
@@ -136,17 +105,106 @@ The most frequent case for a mixed reducer is something needing to be added to s
 export default ComponentReliever
 ```
 
-Now in your store file
+
+## Using Rx
+
+Create your `epics` (see [redux-observable](https://github.com/redux-observable/redux-observable)). All methods that have a name ending with 'Epic' will be used.
+```javascript
+
+    import {Reliever} from 'react-redux-reliever'
+    import {Observable} from 'rxjs'
+
+    someEpic(action$) {
+        return action$
+            .ofType('WHATEVER_ACTION') // takes every action of type 'WHATEVER_ACTION' from the action stream
+            .mapTo({type: 'WHATEVER_UPDATE', payload: {value: 'foo'}}) // then maps the action to an action of type 'WHATEVER_UPDATE'. payload will be applied to the state automatically without using a reducer
+    }
+
+    // you can also easily handle async actions
+    someAsyncEpic(action$) {
+        return action$
+            .ofType('WHATEVER_ACTION_ASYNC')
+            .flatMap(action => {
+                return Observable
+                    .fromPromise((async () => {
+                        const result = await fetch(`https://some-api.com/foo?userId=${action.userId}`)
+                        return await result.json()
+                    })())
+                    .map(json => {
+                        return {
+                            type: 'WHATEVER_USER_DATA_FETCHED',
+                            payload: {
+                                userData: json.foo
+                            }
+                        }
+                    })
+            })
+    }
+```
+
+`RxRelieverPlugin` also extends `Observable` (see [rxjs](https://github.com/reactivex/rxjs)) to provide you with convenient methods to access and observe the `store` and `state`
+```javascript
+    Observable.getStore() // store observable, triggers once upon subscription
+    Observable.getState() // state observable, triggers once upon subscription
+    Observable.getState('substate') // substate observable, triggers once upon subscription
+    Observable.observeState() // state observable, triggers when the state changes
+    Observable.observeState('substate') // substate observable, triggers when the state changes
+```
+
+This allows you to build complex sequences of actions while leveraging the flexibility and operators of [rxjs](https://github.com/reactivex/rxjs)
+
+```javascript
+    fooEpic(action$) {
+        const shouldStop$ = Observable.observeState('substate')
+            .map(state => state.toJS().someProp)
+            .filter(prop => prop === 'foo') // this observable will trigger when the property someProp === 'foo'
+            .take(1) // unsubscribe once the filter operator has triggered
+
+        return action$
+            .ofType('WHATEVER_FOO_ACTION')
+            .mapTo({type: 'WHATEVER_SOMETHING_ELSE'})
+            .takeUntil(shouldStop$)
+    }
+```
+
+## Using saga
+
+add a `*saga()` method to your reliever and add all your saga logic there
+
+```javascript
+import {takeLatest} from 'redux-saga/effects'
+
+class MyReliever extends Reliever {
+	*handleSomeAction(action) {
+		// do something
+	}
+	
+	*saga() {
+		yield takeLatest('SOME_ACTION', this.handleSomeAction.bind(this))
+	}
+}
+```
+
+## Adding the store
+
+in your store file
 ```javascript
 import RelieverRegistry from "react-redux-reliever"
 ```
-We can register our reliever to the registry
+We can register our plugins and reliever(s) to the registry
 ```javascript
 RelieverRegistry.register(ComponentReliever, "whatever")
+
+RelieverRegistry.use(RxRelieverPlugin)
+RelieverRegistry.use(SagaRelieverPlugin)
+RelieverRegistry.use(MyOwnPlugin)
 ```
 
 We can then use the registry to create the store and rootReducer like so
 ```javascript
+
+const rootReducer = RelieverRegistry.buildRootReducer()
+
 // You can pass an object to include other reducers you may have
 // By default everything will be on the same level in your store but you can pass
 // an extra argument to put reducers from the registry on another level
@@ -154,7 +212,7 @@ const rootReducer = RelieverRegistry.buildRootReducer({
     otherReducer: myOtherReducer
 }, "customLevelInStore")
 
-const store = createStore(RelieverRegistry.buildRootReducer(), applyMiddleware(RelieverRegistry.middleware(), logger))
+const store = createStore(RelieverRegistry.buildRootReducer(), applyMiddleware(...RelieverRegistry.middlewares(), logger))
 RelieverRegistry.setupStore(store)
 ```
 

@@ -1,5 +1,6 @@
 import {Reliever} from 'react-redux-reliever'
 import {Observable} from 'rxjs'
+import {takeLatest} from 'redux-saga/effects'
 
 class CounterReliever extends Reliever {
   ACTION_PREFIX = 'COUNTER'
@@ -8,6 +9,14 @@ class CounterReliever extends Reliever {
     return {
       value: 0
     }
+  }
+
+  *sagaSideEffect(action) {
+    console.log('some saga side effect', action)
+  }
+
+  *saga() {
+    yield takeLatest('COUNTER_INCREMENT', this.sagaSideEffect.bind(this))
   }
 
   incrementEpic(action$) {
