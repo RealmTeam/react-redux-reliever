@@ -117,7 +117,8 @@ Observable.prototype.mapAsync = function(factory) {
   return this.flatMap(data => {
     return Observable.fromPromise(
       (async () => {
-        await factory(data)
+        const res = await factory(data)
+        return res
       })()
     )
   })

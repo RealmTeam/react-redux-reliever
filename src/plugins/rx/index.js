@@ -56,5 +56,3 @@ Rx.Observable.observeState = module => {
     .subscribe()
   return Rx.Observable.stateSubject$
 }
-
-console.log(Rx)
