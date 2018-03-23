@@ -26,17 +26,15 @@ $ yarn add react-redux-reliever
 ## Plugins
  * Rx: based on [redux-observable](https://github.com/redux-observable/redux-observable).
  ```javascript
-    import RxRelieverPlugin from 'react-redux-reliever/plugins/rx'
-    import RelieverRegistry from 'react-redux-reliever'
+    import RelieverRegistry, {plugins} from 'react-redux-reliever'
 
-    RelieverRegistry.use(RxRelieverPlugin)
+    RelieverRegistry.use(plugins.RxRelieverPlugin)
  ```
  * Saga: based on [redux-saga](https://github.com/redux-saga/redux-saga).
  ```javascript
-    import SagaRelieverPlugin from 'react-redux-reliever/plugins/saga'
-    import RelieverRegistry from 'react-redux-reliever'
+    import RelieverRegistry, {plugins} from 'react-redux-reliever'
 
-    RelieverRegistry.use(SagaRelieverPlugin)
+    RelieverRegistry.use(plugins.SagaRelieverPlugin)
  ```
 
 You may also create your own plugins using the following interface.
