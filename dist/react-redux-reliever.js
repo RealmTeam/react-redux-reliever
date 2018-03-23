@@ -9018,6 +9018,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	          return _this2.modules[key];
 	        }).map(function (module) {
 	          return plugin.createMiddleware(module.reliever);
+	        }).filter(function (middleware) {
+	          return middleware;
 	        });
 	      }).reduce(function (p, c) {
 	        return [].concat((0, _toConsumableArray3.default)(p), (0, _toConsumableArray3.default)(c));
