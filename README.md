@@ -172,20 +172,17 @@ This allows you to build complex sequences of actions while leveraging the flexi
 add a `*saga()` method to your reliever and add all your saga logic there
 
 ```javascript
-	
-    import {takeLatest} from 'redux-saga/effects'
-    
-	class MyReliever extends Reliever {
-    
-    	*handleSomeAction(action) {
-        	// do something
-        }
-    
-    	*saga() {
-        	yield takeLatest('SOME_ACTION', this.handleSomeAction.bind(this))
-        }
-    }
+import {takeLatest} from 'redux-saga/effects'
 
+class MyReliever extends Reliever {
+	*handleSomeAction(action) {
+		// do something
+	}
+	
+	*saga() {
+		yield takeLatest('SOME_ACTION', this.handleSomeAction.bind(this))
+	}
+}
 ```
 
 ## Adding the store
