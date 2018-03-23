@@ -42,9 +42,9 @@ $ yarn add react-redux-reliever
 You may also create your own plugins using the following interface.
 ```javascript
 	class SomePlugin {
-    	createMiddleware(reliever) {}
-        setupStore(store) {}
-    }
+    		createMiddleware(reliever) {}
+	        setupStore(store) {}
+	}
     
     RelieverRegistry.use(SomePlugin)
 ```
