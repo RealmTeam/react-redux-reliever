@@ -1,6 +1,8 @@
 import {fromJS} from 'immutable'
 import RelieverRegistry from './registry'
 import merger from './utils/merger'
+import RxRelieverPlugin from './plugins/rx'
+import SagaRelieverPlugin from './plugins/saga'
 
 class Reliever {
   ACTION_PREFIX = '(unset)'
@@ -20,4 +22,9 @@ class Reliever {
   }
 }
 
-export {Reliever, RelieverRegistry as default}
+const plugins = {
+  RxRelieverPlugin,
+  SagaRelieverPlugin
+}
+
+export {Reliever, RelieverRegistry as default, plugins}
