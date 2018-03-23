@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PhilipGarnero/react-redux-reliever.git"
+    "url": "git+https://github.com/RealmTeam/react-redux-reliever"
   },
   "keywords": [
     "javascript",
@@ -29,9 +29,9 @@
   "author": "Philip GARNERO <philip.garnero@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/PhilipGarnero/react-redux-reliever/issues"
+    "url": "https://github.com/RealmTeam/react-redux-reliever/issues"
   },
-  "homepage": "https://github.com/PhilipGarnero/react-redux-reliever#readme",
+  "homepage": "https://github.com/RealmTeam/react-redux-reliever#readme",
   "dependencies": {
     "eslint-plugin-redux-reliever": "1.5.0",
     "immutable": "^3.8.2",
