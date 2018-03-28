@@ -25857,7 +25857,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }).map(function (key) {
 	        return reliever[key].bind(reliever);
 	      });
-	      var middleware = (0, _reduxObservable.createEpicMiddleware)(_reduxObservable.combineEpics.apply(undefined, (0, _toConsumableArray3.default)(epics)));
+	      var middleware = (0, _reduxObservable.createEpicMiddleware)(_reduxObservable.combineEpics.apply(undefined, (0, _toConsumableArray3.default)(epics)), {
+	        adapter: {
+	          input: function input(action$) {
+	            if (!RxRelieverPlugin.instance.action$) {
+	              RxRelieverPlugin.instance.action$ = action$;
+	            }
+	            return action$;
+	          },
+	          output: function output(action$) {
+	            return action$.filter(function (action) {
+	              return action && action.type;
+	            });
+	          }
+	        }
+	      });
 	      return middleware;
 	    }
 	  }]);
@@ -25881,6 +25895,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (module) return state[module];
 	    return state;
 	  });
+	};
+
+	_utils2.default.Observable.actionStream = function () {
+	  return RxRelieverPlugin.instance.action$;
 	};
 
 	_utils2.default.Observable.observeState = function (module) {
