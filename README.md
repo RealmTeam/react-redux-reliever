@@ -49,7 +49,7 @@ You may also create your own plugins using the following interface.
 
 ## Usage Example
 
-First, import `Reliever` and `register`
+First, import `RelieverRegistry` and `Reliever`
 ```javascript
 import RelieverRegistry, {Reliever} from 'react-redux-reliever'
 ```
@@ -112,31 +112,34 @@ Create your `epics` (see [redux-observable](https://github.com/redux-observable/
     import {Reliever} from 'react-redux-reliever'
     import {Observable} from 'rxjs'
 
-    someEpic(action$) {
-        return action$
-            .ofType('WHATEVER_ACTION') // takes every action of type 'WHATEVER_ACTION' from the action stream
-            .mapTo({type: 'WHATEVER_UPDATE', payload: {value: 'foo'}}) // then maps the action to an action of type 'WHATEVER_UPDATE'. payload will be applied to the state automatically without using a reducer
-    }
+    class SomeReliever extends Reliever {
 
-    // you can also easily handle async actions
-    someAsyncEpic(action$) {
-        return action$
-            .ofType('WHATEVER_ACTION_ASYNC')
-            .flatMap(action => {
-                return Observable
-                    .fromPromise((async () => {
-                        const result = await fetch(`https://some-api.com/foo?userId=${action.userId}`)
-                        return await result.json()
-                    })())
-                    .map(json => {
-                        return {
-                            type: 'WHATEVER_USER_DATA_FETCHED',
-                            payload: {
-                                userData: json.foo
+        someEpic(action$) {
+            return action$
+                .ofType('WHATEVER_ACTION') // takes every action of type 'WHATEVER_ACTION' from the action stream
+                .mapTo({type: 'WHATEVER_UPDATE', payload: {value: 'foo'}}) // then maps the action to an action of type 'WHATEVER_UPDATE'. payload will be applied to the state automatically without using a reducer
+        }
+
+        // you can also easily handle async actions
+        someAsyncEpic(action$) {
+            return action$
+                .ofType('WHATEVER_ACTION_ASYNC')
+                .flatMap(action => {
+                    return Observable
+                        .defer(async () => {
+                            const result = await fetch(`https://some-api.com/foo?userId=${action.userId}`)
+                            return await result.json()
+                        })
+                        .map(json => {
+                            return {
+                                type: 'WHATEVER_USER_DATA_FETCHED',
+                                payload: {
+                                    userData: json.foo
+                                }
                             }
-                        }
-                    })
-            })
+                        })
+                })
+        }
     }
 ```
 
@@ -147,6 +150,18 @@ Create your `epics` (see [redux-observable](https://github.com/redux-observable/
     Observable.getState('substate') // substate observable, triggers once upon subscription
     Observable.observeState() // state observable, triggers when the state changes
     Observable.observeState('substate') // substate observable, triggers when the state changes
+
+    Observable.actionStream() // returns the global action stream
+    // you may use `actionStream` to wait for other actions to be dispatched before taking further actions
+    // ex:
+    action$
+        .ofType('SOME_ACTION')
+        .flatMap(() => {
+            return Observable.actionStream()
+                .ofType('SOMETHING_ELSE')
+                .take(1) 
+                .map(() => 'foo')
+        })
 ```
 
 This allows you to build complex sequences of actions while leveraging the flexibility and operators of [rxjs](https://github.com/reactivex/rxjs)
@@ -187,14 +202,14 @@ class MyReliever extends Reliever {
 
 in your store file
 ```javascript
-import RelieverRegistry from "react-redux-reliever"
+import RelieverRegistry, {plugins} from "react-redux-reliever"
 ```
 We can register our plugins and reliever(s) to the registry
 ```javascript
 RelieverRegistry.register(ComponentReliever, "whatever")
 
-RelieverRegistry.use(RxRelieverPlugin)
-RelieverRegistry.use(SagaRelieverPlugin)
+RelieverRegistry.use(plugins.RxRelieverPlugin)
+RelieverRegistry.use(plugins.SagaRelieverPlugin)
 RelieverRegistry.use(MyOwnPlugin)
 ```
 

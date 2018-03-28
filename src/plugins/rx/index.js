@@ -23,7 +23,19 @@ export default class RxRelieverPlugin {
     const epics = getAllProperties(reliever)
       .filter(key => key.endsWith('Epic'))
       .map(key => reliever[key].bind(reliever))
-    const middleware = createEpicMiddleware(combineEpics(...epics))
+    const middleware = createEpicMiddleware(combineEpics(...epics), {
+      adapter: {
+        input: action$ => {
+          if (!RxRelieverPlugin.instance.action$) {
+            RxRelieverPlugin.instance.action$ = action$
+          }
+          return action$
+        },
+        output: action$ => {
+          return action$.filter(action => action && action.type)
+        }
+      }
+    })
     return middleware
   }
 }
@@ -42,6 +54,8 @@ Rx.Observable.getState = module =>
     if (module) return state[module]
     return state
   })
+
+Rx.Observable.actionStream = () => RxRelieverPlugin.instance.action$
 
 Rx.Observable.observeState = module => {
   if (Rx.Observable.stateSubject$) return Rx.Observable.stateSubject$
