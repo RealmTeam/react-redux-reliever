@@ -40,10 +40,6 @@ export default class RxRelieverPlugin {
   }
 }
 
-Rx.Observable.actions = {
-  noop: {type: '___NO-OP___'}
-}
-
 Rx.Observable.getStore = () => {
   return RxRelieverPlugin.instance.store$
 }
@@ -55,7 +51,7 @@ Rx.Observable.getState = module =>
     return state
   })
 
-Rx.Observable.actionStream = () => RxRelieverPlugin.instance.action$
+Rx.Observable.reduxActionStream = () => RxRelieverPlugin.instance.action$
 
 Rx.Observable.observeState = module => {
   if (Rx.Observable.stateSubject$) return Rx.Observable.stateSubject$
