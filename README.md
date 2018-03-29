@@ -151,13 +151,13 @@ Create your `epics` (see [redux-observable](https://github.com/redux-observable/
     Observable.observeState() // state observable, triggers when the state changes
     Observable.observeState('substate') // substate observable, triggers when the state changes
 
-    Observable.actionStream() // returns the global action stream
-    // you may use `actionStream` to wait for other actions to be dispatched before taking further actions
+    Observable.reduxActionStream() // returns the global action stream
+    // you may use `reduxActionStream` to wait for other actions to be dispatched before taking further actions
     // ex:
     action$
         .ofType('SOME_ACTION')
         .flatMap(() => {
-            return Observable.actionStream()
+            return Observable.reduxActionStream()
                 .ofType('SOMETHING_ELSE')
                 .take(1) 
                 .map(() => 'foo')
