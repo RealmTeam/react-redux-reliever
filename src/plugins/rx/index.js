@@ -1,4 +1,4 @@
-import Rx from './utils'
+import Rx from 'rxjs'
 import {combineEpics, createEpicMiddleware} from 'redux-observable'
 
 function getAllProperties(obj, p = []) {
