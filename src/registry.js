@@ -14,11 +14,11 @@ class RelieverRegistry {
   }
 
   setupStore(store) {
-    this.plugins.forEach(plugin => plugin.setupStore(store))
+    this.plugins.forEach(plugin => plugin.instance.setupStore(store, plugin.options))
   }
 
-  use(...plugins) {
-    plugins.forEach(plugin => this.plugins.push(new plugin()))
+  use(plugin, options) {
+    this.plugins.push({instance: new plugin(), options})
     return this
   }
 
@@ -70,7 +70,7 @@ class RelieverRegistry {
       .map(plugin => {
         return Object.keys(this.modules)
           .map(key => this.modules[key])
-          .map(module => plugin.createMiddleware(module.reliever))
+          .map(module => plugin.instance.createMiddleware(module.reliever, plugin.options))
           .filter(middleware => middleware)
       })
       .reduce((p, c) => [...p, ...c], [])

@@ -11,7 +11,12 @@ import SagaRelieverPlugin from 'react-redux-reliever/plugins/saga'
 import CounterReliever from './relievers/CounterReliever'
 import Counter from './components/Counter'
 
-RelieverRegistry.use(RxRelieverPlugin)
+RelieverRegistry.use(RxRelieverPlugin, {
+  output: action$ => {
+    console.log('output stream is', action$)
+    return action$
+  }
+})
 RelieverRegistry.use(SagaRelieverPlugin)
 RelieverRegistry.register(CounterReliever, 'counter')
 

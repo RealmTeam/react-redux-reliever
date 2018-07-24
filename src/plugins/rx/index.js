@@ -19,7 +19,7 @@ export default class RxRelieverPlugin {
     this.store$.next(store)
   }
 
-  createMiddleware(reliever) {
+  createMiddleware(reliever, options = {}) {
     const epics = getAllProperties(reliever)
       .filter(key => key.endsWith('Epic'))
       .map(key => reliever[key].bind(reliever))
@@ -29,10 +29,11 @@ export default class RxRelieverPlugin {
           if (!RxRelieverPlugin.instance.action$) {
             RxRelieverPlugin.instance.action$ = action$
           }
-          return action$
+          return options.input ? options.input(action$) : action$
         },
         output: action$ => {
-          return action$.filter(action => action && action.type)
+          const stream$ = action$.filter(action => action && action.type)
+          return options.output ? options.output(stream$) : stream$
         }
       }
     })

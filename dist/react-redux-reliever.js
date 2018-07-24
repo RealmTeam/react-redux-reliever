@@ -25504,6 +25504,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'createMiddleware',
 	    value: function createMiddleware(reliever) {
+	      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
 	      var epics = getAllProperties(reliever).filter(function (key) {
 	        return key.endsWith('Epic');
 	      }).map(function (key) {
@@ -25515,12 +25517,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (!RxRelieverPlugin.instance.action$) {
 	              RxRelieverPlugin.instance.action$ = action$;
 	            }
-	            return action$;
+	            return options.input ? options.input(action$) : action$;
 	          },
 	          output: function output(action$) {
-	            return action$.filter(function (action) {
+	            var stream$ = action$.filter(function (action) {
 	              return action && action.type;
 	            });
+	            return options.output ? options.output(stream$) : stream$;
 	          }
 	        }
 	      });
@@ -25710,21 +25713,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'setupStore',
 	    value: function setupStore(store) {
 	      this.plugins.forEach(function (plugin) {
-	        return plugin.setupStore(store);
+	        return plugin.instance.setupStore(store, plugin.options);
 	      });
 	    }
 	  }, {
 	    key: 'use',
-	    value: function use() {
-	      var _this = this;
-
-	      for (var _len = arguments.length, plugins = Array(_len), _key = 0; _key < _len; _key++) {
-	        plugins[_key] = arguments[_key];
-	      }
-
-	      plugins.forEach(function (plugin) {
-	        return _this.plugins.push(new plugin());
-	      });
+	    value: function use(plugin, options) {
+	      this.plugins.push({ instance: new plugin(), options: options });
 	      return this;
 	    }
 	  }, {
@@ -25793,13 +25788,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'middlewares',
 	    value: function middlewares() {
-	      var _this2 = this;
+	      var _this = this;
 
 	      return this.plugins.map(function (plugin) {
-	        return Object.keys(_this2.modules).map(function (key) {
-	          return _this2.modules[key];
+	        return Object.keys(_this.modules).map(function (key) {
+	          return _this.modules[key];
 	        }).map(function (module) {
-	          return plugin.createMiddleware(module.reliever);
+	          return plugin.instance.createMiddleware(module.reliever, plugin.options);
 	        }).filter(function (middleware) {
 	          return middleware;
 	        });
