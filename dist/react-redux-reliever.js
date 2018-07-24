@@ -25733,7 +25733,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var reducer = relievedComponent.reducer.bind(relievedComponent);
 	      var actions = relievedComponent.getActions();
 	      reducerKey = reducerKey || moduleName;
-	      this.modules[moduleName] = { reliever: relievedComponent, reducer: reducer, reducerKey: reducerKey, actions: actions };
+	      this.modules[moduleName] = { reliever: relievedComponent, reducer: reducer, reducerKey: reducerKey, actions: actions, name: moduleName };
 	    }
 	  }, {
 	    key: 'changeModuleReducerKey',
@@ -25794,7 +25794,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return Object.keys(_this.modules).map(function (key) {
 	          return _this.modules[key];
 	        }).map(function (module) {
-	          return plugin.instance.createMiddleware(module.reliever, plugin.options);
+	          return plugin.instance.createMiddleware(module.reliever, plugin.options, module);
 	        }).filter(function (middleware) {
 	          return middleware;
 	        });

@@ -28,7 +28,7 @@ class RelieverRegistry {
     const reducer = relievedComponent.reducer.bind(relievedComponent)
     const actions = relievedComponent.getActions()
     reducerKey = reducerKey || moduleName
-    this.modules[moduleName] = {reliever: relievedComponent, reducer, reducerKey, actions}
+    this.modules[moduleName] = {reliever: relievedComponent, reducer, reducerKey, actions, name: moduleName}
   }
 
   changeModuleReducerKey(moduleName, reducerKey) {
@@ -70,7 +70,7 @@ class RelieverRegistry {
       .map(plugin => {
         return Object.keys(this.modules)
           .map(key => this.modules[key])
-          .map(module => plugin.instance.createMiddleware(module.reliever, plugin.options))
+          .map(module => plugin.instance.createMiddleware(module.reliever, plugin.options, module))
           .filter(middleware => middleware)
       })
       .reduce((p, c) => [...p, ...c], [])
