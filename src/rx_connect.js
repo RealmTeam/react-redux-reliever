@@ -9,7 +9,7 @@ function getDisplayName(WrappedComponent) {
 
 export default function connect(createStream) {
   return function wrappedWithConnect(Wrapped, options = {}) {
-    const {pure = true, addOwnProps = true} = options
+    const {pure = true, addOwnProps = true, renderLoading} = options
     const connectDisplayName = `RelievedRxConnect(${getDisplayName(Wrapped)})`
 
     class Connect extends Component {
@@ -23,7 +23,7 @@ export default function connect(createStream) {
           stream: new Subject(),
           create: createStream.props[prop]
         }))
-        this.state = {storeState: this.store.getState()}
+        this.state = {storeState: this.store.getState(), hasLoaded: false}
       }
 
       componentWillReceiveProps(nextProps) {
@@ -55,7 +55,7 @@ export default function connect(createStream) {
           if (addOwnProps) {
             Object.assign(computedProps, ownProps)
           }
-          this.setState({computedProps, storeState: this.store.getState()})
+          this.setState({computedProps, storeState: this.store.getState(), hasLoaded: true})
         })
 
         const storeState$ = pure ? this.storeStateSubject$.distinctUntilChanged() : this.storeStateSubject$
@@ -75,7 +75,8 @@ export default function connect(createStream) {
       }
 
       render() {
-        const {computedProps} = this.state
+        const {computedProps, hasLoaded} = this.state
+        if (!hasLoaded) return renderLoading ? renderLoading() : null
         return createElement(Wrapped, computedProps)
       }
     }
