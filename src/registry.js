@@ -1,5 +1,6 @@
 import {combineReducers} from 'redux'
 import connect from './connect'
+import connect$ from './rx_connect'
 
 class RelieverRegistry {
   constructor() {
@@ -54,6 +55,10 @@ class RelieverRegistry {
       ...props(state, ownProps),
       ...functions(state, ownProps, dispatch)
     }))
+  }
+
+  connect$(createStreams) {
+    return connect$(createStreams)
   }
 
   moduleState(moduleName, state) {
