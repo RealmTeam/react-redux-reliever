@@ -4,7 +4,7 @@ export const DEL = '__DEL__'
 export const OVERWRITE = '__OVERWRITE__'
 
 export default function merger(a, b) {
-  if (b[OVERWRITE] || (isImmutable(b) && b.get(OVERWRITE))) {
+  if (b && (b[OVERWRITE] || (isImmutable(b) && b.get(OVERWRITE)))) {
     if (isImmutable(b)) b = b.delete(OVERWRITE)
     else delete b[OVERWRITE]
     return b
@@ -21,7 +21,7 @@ export default function merger(a, b) {
     })
   }
 
-  if (a && a.mergeWith && !List.isList(a) && b !== null) {
+  if (a && a.mergeWith && !List.isList(a) && b != null) {
     return a.mergeWith(merger, b)
   }
   return b

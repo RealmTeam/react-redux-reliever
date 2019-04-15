@@ -27414,7 +27414,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var OVERWRITE = exports.OVERWRITE = '__OVERWRITE__';
 
 	function merger(a, b) {
-	  if (b[OVERWRITE] || (0, _immutable.isImmutable)(b) && b.get(OVERWRITE)) {
+	  if (b && (b[OVERWRITE] || (0, _immutable.isImmutable)(b) && b.get(OVERWRITE))) {
 	    if ((0, _immutable.isImmutable)(b)) b = b.delete(OVERWRITE);else delete b[OVERWRITE];
 	    return b;
 	  }
@@ -27432,7 +27432,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	  }
 
-	  if (a && a.mergeWith && !_immutable.List.isList(a) && b !== null) {
+	  if (a && a.mergeWith && !_immutable.List.isList(a) && b != null) {
 	    return a.mergeWith(merger, b);
 	  }
 	  return b;
