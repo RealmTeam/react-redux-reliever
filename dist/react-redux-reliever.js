@@ -27432,7 +27432,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	  }
 
-	  if (a && a.mergeWith && !_immutable.List.isList(a) && b != null) {
+	  if (a && a.mergeWith && !_immutable.List.isList(a) && b !== null) {
 	    return a.mergeWith(merger, b);
 	  }
 	  return b;
