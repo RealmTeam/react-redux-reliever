@@ -1,6 +1,6 @@
 {
   "name": "react-redux-reliever",
-  "version": "1.6.3",
+  "version": "1.6.4",
   "description": "Stop opening four different files to code a simple feature when using redux",
   "main": "lib/index.js",
   "jsnext:main": "es/index.js",
