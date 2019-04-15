@@ -17,7 +17,7 @@ class Reliever {
 
   reducer(state, action) {
     if (state === undefined) state = fromJS(this.getInitialState())
-    if (action.type.startsWith(this.ACTION_PREFIX + '_')) return merger(state, action.payload)
+    if (action.type.startsWith(this.ACTION_PREFIX + '_')) return merger(state, fromJS(action.payload))
     return state
   }
 }

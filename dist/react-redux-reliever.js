@@ -109,7 +109,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'reducer',
 	    value: function reducer(state, action) {
 	      if (state === undefined) state = (0, _immutable.fromJS)(this.getInitialState());
-	      if (action.type.startsWith(this.ACTION_PREFIX + '_')) return (0, _merger2.default)(state, action.payload);
+	      if (action.type.startsWith(this.ACTION_PREFIX + '_')) return (0, _merger2.default)(state, (0, _immutable.fromJS)(action.payload));
 	      return state;
 	    }
 	  }]);
