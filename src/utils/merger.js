@@ -10,7 +10,7 @@ export default function merger(a, b) {
     return b
   }
 
-  if (Map.isMap(a) || (!isImmutable(a) && typeof a === 'object' && Map.isMap(b)) || (!isImmutable(b) && typeof b === 'object')) {
+  if (a && b && (Map.isMap(a) || (!isImmutable(a) && typeof a === 'object' && Map.isMap(b)) || (!isImmutable(b) && typeof b === 'object'))) {
     (isImmutable(b) ? b.entrySeq() : Object.entries(b)).forEach(([k, v]) => {
       if (v === DEL) {
         if (isImmutable(b)) b = b.delete(k)

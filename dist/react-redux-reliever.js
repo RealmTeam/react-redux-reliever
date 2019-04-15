@@ -27419,7 +27419,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return b;
 	  }
 
-	  if (_immutable.Map.isMap(a) || !(0, _immutable.isImmutable)(a) && (typeof a === 'undefined' ? 'undefined' : (0, _typeof3.default)(a)) === 'object' && _immutable.Map.isMap(b) || !(0, _immutable.isImmutable)(b) && (typeof b === 'undefined' ? 'undefined' : (0, _typeof3.default)(b)) === 'object') {
+	  if (a && b && (_immutable.Map.isMap(a) || !(0, _immutable.isImmutable)(a) && (typeof a === 'undefined' ? 'undefined' : (0, _typeof3.default)(a)) === 'object' && _immutable.Map.isMap(b) || !(0, _immutable.isImmutable)(b) && (typeof b === 'undefined' ? 'undefined' : (0, _typeof3.default)(b)) === 'object')) {
 	    ((0, _immutable.isImmutable)(b) ? b.entrySeq() : Object.entries(b)).forEach(function (_ref) {
 	      var _ref2 = (0, _slicedToArray3.default)(_ref, 2),
 	          k = _ref2[0],
