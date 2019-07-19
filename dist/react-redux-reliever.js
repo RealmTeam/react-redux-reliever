@@ -27413,13 +27413,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	var DEL = exports.DEL = '__DEL__';
 	var OVERWRITE = exports.OVERWRITE = '__OVERWRITE__';
 
+	// https://stackoverflow.com/questions/5876332/how-can-i-differentiate-between-an-object-literal-other-javascript-objects/5878101#5878101
+	function isPlainObject(obj) {
+	  if ((typeof obj === 'undefined' ? 'undefined' : (0, _typeof3.default)(obj)) == 'object' && obj !== null) {
+	    if (typeof Object.getPrototypeOf == 'function') {
+	      var proto = Object.getPrototypeOf(obj);
+	      return proto === Object.prototype || proto === null;
+	    }
+	    return Object.prototype.toString.call(obj) == '[object Object]';
+	  }
+	  return false;
+	}
+
 	function merger(a, b) {
-	  if (b && (b[OVERWRITE] || (0, _immutable.isImmutable)(b) && b.get(OVERWRITE))) {
+	  // Overwrite handling OVERWRITE
+	  if (b && (isPlainObject(b) && b[OVERWRITE] || (0, _immutable.isImmutable)(b) && b.get(OVERWRITE))) {
 	    if ((0, _immutable.isImmutable)(b)) b = b.delete(OVERWRITE);else delete b[OVERWRITE];
 	    return b;
 	  }
 
-	  if (a && b && (_immutable.Map.isMap(a) || !(0, _immutable.isImmutable)(a) && (typeof a === 'undefined' ? 'undefined' : (0, _typeof3.default)(a)) === 'object' && _immutable.Map.isMap(b) || !(0, _immutable.isImmutable)(b) && (typeof b === 'undefined' ? 'undefined' : (0, _typeof3.default)(b)) === 'object')) {
+	  // Deletion handling DEL
+	  if (a && (_immutable.Map.isMap(a) || isPlainObject(a)) && b && (_immutable.Map.isMap(b) || isPlainObject(b))) {
 	    ((0, _immutable.isImmutable)(b) ? b.entrySeq() : Object.entries(b)).forEach(function (_ref) {
 	      var _ref2 = (0, _slicedToArray3.default)(_ref, 2),
 	          k = _ref2[0],
@@ -27432,7 +27446,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	  }
 
-	  if (a && a.mergeWith && !_immutable.List.isList(a) && b !== null) {
+	  // Regular merge
+	  if (a && a.mergeWith && !_immutable.List.isList(a) && b !== null && (_immutable.Map.isMap(b) || isPlainObject(b))) {
 	    return a.mergeWith(merger, b);
 	  }
 	  return b;
