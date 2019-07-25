@@ -20,6 +20,8 @@ class CounterReliever extends Reliever {
   }
 
   incrementEpic(action$) {
+    console.log(action$)
+    console.log(action$.ofType('COUNTER_INCREMENT'))
     return action$.ofType('COUNTER_INCREMENT').flatMap(() => {
       return Observable.getState('counter')
         .map(x => x.toJS())

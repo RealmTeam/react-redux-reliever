@@ -1,5 +1,6 @@
 import {fromJS} from 'immutable'
 import RelieverRegistry from './registry'
+import connect from './connect'
 import merger, {DEL, OVERWRITE} from './utils/merger'
 import RxRelieverPlugin from './plugins/rx'
 import SagaRelieverPlugin from './plugins/saga'
@@ -17,7 +18,7 @@ class Reliever {
 
   reducer(state, action) {
     if (state === undefined) state = fromJS(this.getInitialState())
-    if (action.type.startsWith(this.ACTION_PREFIX + '_')) return merger(state, fromJS(action.payload))
+    if (action.type.startsWith(this.ACTION_PREFIX + '_') && action.payload) return merger(state, fromJS(action.payload))
     return state
   }
 }
@@ -27,4 +28,4 @@ const plugins = {
   SagaRelieverPlugin
 }
 
-export {Reliever, RelieverRegistry as default, plugins, DEL, OVERWRITE}
+export {Reliever, connect, RelieverRegistry as default, plugins, DEL, OVERWRITE}

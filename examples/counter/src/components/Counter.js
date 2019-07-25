@@ -1,7 +1,6 @@
 /*eslint-disable no-unused-vars */
 import React from 'react'
 import RelieverRegistry from 'react-redux-reliever'
-import {Scheduler} from 'rxjs'
 
 const Counter = ({value, incr, incrAsync, decr, incrIfOdd, setToTen, startTimer}) => (
   <p>
@@ -11,23 +10,11 @@ const Counter = ({value, incr, incrAsync, decr, incrIfOdd, setToTen, startTimer}
   </p>
 )
 
-export default RelieverRegistry.connect$({
-  props: {
-    value: state$ => state$.map(state => state.counter.get('value')),
-    heavyWorkData: state$ =>
-      state$
-        .map(state => state.counter.get('value'))
-        .observeOn(Scheduler.asap)
-        .map(value => {
-          let i = 0
-          while (i < value * 500) {
-            console.log('doing heavy work')
-            i++
-          }
-          return value
-        })
-  },
-  functions: (state, ownProps, dispatch) => ({
+export default RelieverRegistry.connect({
+  props: (state, ownProps) => ({
+    value: RelieverRegistry.moduleState('counter', state).get('value'),
+  }),
+  functions: (props, dispatch) => ({
     startTimer: () => {
       dispatch({type: 'COUNTER_START_TIMER'})
     },
@@ -41,7 +28,7 @@ export default RelieverRegistry.connect$({
       dispatch(RelieverRegistry.moduleActions('counter').incrementAsync())
     },
     incrIfOdd: () => {
-      if (state.counter.get('value') % 2 !== 0) dispatch(RelieverRegistry.moduleActions('counter').increment())
+      if (props.value % 2 !== 0) dispatch(RelieverRegistry.moduleActions('counter').increment())
     },
     decr: () => {
       dispatch(RelieverRegistry.moduleActions('counter').decrement())
@@ -49,28 +36,3 @@ export default RelieverRegistry.connect$({
   })
 })(Counter)
 
-//or
-
-// export default RelieverRegistry.connect({
-//   props: (state, ownProps) => ({value: RelieverRegistry.moduleState('counter', state).get('value'), ...ownProps}),
-//   functions: (state, ownProps, dispatch) => ({
-//     startTimer: () => {
-//       dispatch({type: 'COUNTER_START_TIMER'})
-//     },
-//     incr: () => {
-//       dispatch(RelieverRegistry.moduleActions('counter').increment())
-//     },
-//     setToTen: () => {
-//       dispatch(RelieverRegistry.moduleActions('counter').set(10))
-//     },
-//     incrAsync: () => {
-//       dispatch(RelieverRegistry.moduleActions('counter').incrementAsync())
-//     },
-//     incrIfOdd: () => {
-//       if (state.counter.get('value') % 2 !== 0) dispatch(RelieverRegistry.moduleActions('counter').increment())
-//     },
-//     decr: () => {
-//       dispatch(RelieverRegistry.moduleActions('counter').decrement())
-//     }
-//   })
-// })(Counter)

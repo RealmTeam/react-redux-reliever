@@ -1,6 +1,4 @@
 import {combineReducers} from 'redux'
-import connect from './connect'
-import connect$ from './rx_connect'
 
 class RelieverRegistry {
   constructor() {
@@ -46,19 +44,6 @@ class RelieverRegistry {
       return combineReducers({...rootReducer, [modulesRootReducerKey]: combineReducers(moduleReducers)})
     }
     return combineReducers({...moduleReducers, ...rootReducer})
-  }
-
-  connect({props, functions}) {
-    if (!props) props = (state, ownProps) => ownProps
-    if (!functions) functions = () => ({})
-    return connect((state, dispatch, ownProps) => ({
-      ...props(state, ownProps),
-      ...functions(state, ownProps, dispatch)
-    }))
-  }
-
-  connect$(createStreams) {
-    return connect$(createStreams)
   }
 
   moduleState(moduleName, state) {

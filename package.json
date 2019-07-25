@@ -1,6 +1,6 @@
 {
   "name": "react-redux-reliever",
-  "version": "1.6.8",
+  "version": "2.0.0",
   "description": "Stop opening four different files to code a simple feature when using redux",
   "main": "lib/index.js",
   "jsnext:main": "es/index.js",
@@ -8,10 +8,8 @@
     "lint": "eslint src && eslint examples",
     "check": "echo \"checks disabled for now\"",
     "compile": "rimraf lib && cross-env BABEL_ENV=cjs babel -d lib/ src/",
-    "build:umd:dev": "cross-env BABEL_ENV=cjs webpack src/index.js dist/react-redux-reliever.js --config webpack.config.dev.js",
-    "build:umd:prod": "cross-env BABEL_ENV=cjs webpack src/index.js dist/react-redux-reliever.min.js --config webpack.config.prod.js",
     "build:es": "cross-env BABEL_ENV=es babel src --out-dir es",
-    "build": "rimraf dist es && npm run build:umd:dev && npm run build:umd:prod && npm run build:es",
+    "build": "rimraf es && npm run build:es",
     "prepublish": "npm run check && npm run compile && npm run build",
     "counter": "cross-env BABEL_ENV=cjs node examples/counter/server.js"
   },
@@ -34,12 +32,7 @@
   "homepage": "https://github.com/RealmTeam/react-redux-reliever#readme",
   "dependencies": {
     "eslint-plugin-redux-reliever": "1.5.0",
-    "immutable": "^4.0.0-rc.12",
-    "prop-types": "^15.5.7",
-    "react-redux": "^4.4.5",
-    "redux-observable": "^0.18.0",
-    "redux-saga": "^0.16.0",
-    "rxjs": "^5.5.7"
+    "shallow-equal": "^1.2.0"
   },
   "devDependencies": {
     "babel-cli": "^6.1.18",
@@ -51,21 +44,32 @@
     "babel-preset-react-app": "^3.0.3",
     "babel-preset-stage-2": "^6.24.1",
     "babel-runtime": "^6.23.0",
-    "cross-env": "^1.0.8",
-    "eslint": "^2.8.0",
+    "cross-env": "^5.2.0",
+    "eslint": "^6.0.1",
     "express": "^4.16.1",
-    "gitbook-cli": "1.0.1",
-    "lolex": "^1.5.2",
-    "react": "^15.0.0",
-    "react-dom": "^15.0.0",
-    "redux": "^3.5.1",
-    "redux-logger": "^2.6.1",
+    "gitbook-cli": "2.3.2",
+    "lolex": "^4.1.0",
+    "redux-logger": "^3.0.6",
     "rimraf": "^2.4.3",
-    "tap-spec": "^4.1.1",
+    "tap-spec": "^5.0.0",
     "tape": "^4.2.2",
     "webpack": "1.13.0",
     "webpack-dev-middleware": "^1.4.0",
     "webpack-hot-middleware": "^2.6.0"
+  },
+  "peerDependencies": {
+    "immutable": "^4.0.0-rc.12",
+    "prop-types": "^15.5.7",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-redux": "^7.1.0",
+    "redux": "^4.0.4",
+    "redux-observable": "^1.1.0"
+  },
+  "optionalDependencies": {
+    "redux-saga": "^0.16.0",
+    "rxjs": "^6.5.2",
+    "rxjs-compat": "^6.5.2"
   },
   "npmName": "react-redux-reliever",
   "npmFileMap": [
