@@ -143,40 +143,32 @@ Create your `epics` (see [redux-observable](https://github.com/redux-observable/
     }
 ```
 
-`RxRelieverPlugin` also extends `Observable` (see [rxjs](https://github.com/reactivex/rxjs)) to provide you with convenient methods to access and observe the `store` and `state`
+`RxRelieverPlugin` also provides extensions for [rxjs](https://github.com/reactivex/rxjs) to provide you with convenient methods to access and observe the `store` and `state`
 ```javascript
-    Observable.getStore() // store observable, triggers once upon subscription
-    Observable.getState() // state observable, triggers once upon subscription
-    Observable.getState('substate') // substate observable, triggers once upon subscription
-    Observable.observeState() // state observable, triggers when the state changes
-    Observable.observeState('substate') // substate observable, triggers when the state changes
-
-    Observable.reduxActionStream() // returns the global action stream
-    // you may use `reduxActionStream` to wait for other actions to be dispatched before taking further actions
-    // ex:
-    action$
-        .ofType('SOME_ACTION')
-        .flatMap(() => {
-            return Observable.reduxActionStream()
-                .ofType('SOMETHING_ELSE')
-                .take(1) 
-                .map(() => 'foo')
-        })
+    import {plugins} from 'react-redux-reliever'
+    const extensions = plugins.RxRelieverPlugin.instance.extensions()
+    extensions.getStore() // store observable, triggers once upon subscription
+    extensions.getState() // state observable, triggers once upon subscription
+    extensions.getState('substate') // substate observable, triggers once upon subscription
+    extensions.observeState() // state observable, triggers when the state changes
+    extensions.observeState('substate') // substate observable, triggers when the state changes
+    extensions.reduxActionStream() // returns the global action stream
 ```
 
 This allows you to build complex sequences of actions while leveraging the flexibility and operators of [rxjs](https://github.com/reactivex/rxjs)
 
 ```javascript
     fooEpic(action$) {
-        const shouldStop$ = Observable.observeState('substate')
-            .map(state => state.toJS().someProp)
-            .filter(prop => prop === 'foo') // this observable will trigger when the property someProp === 'foo'
-            .take(1) // unsubscribe once the filter operator has triggered
+        const shouldStop$ = extensions.observeState('substate').pipe(
+            map(state => state.toJS().someProp),
+            filter(prop => prop === 'foo'), // this observable will trigger when the property someProp === 'foo'
+            take(1) // unsubscribe once the filter operator has triggered
+        )
 
-        return action$
-            .ofType('WHATEVER_FOO_ACTION')
-            .mapTo({type: 'WHATEVER_SOMETHING_ELSE'})
-            .takeUntil(shouldStop$)
+        return action$.ofType('WHATEVER_FOO_ACTION').pipe(
+            mapTo({type: 'WHATEVER_SOMETHING_ELSE'}),
+            takeUntil(shouldStop$)
+        )
     }
 ```
 
@@ -231,10 +223,10 @@ RelieverRegistry.setupStore(store)
 
 Now you can connect your component to the store.  
 
-You can choose to do it the usual way or you can use the `connect` function of the registry.
+You can choose to do it the usual way or you can use our custom `connect` function.
 In your `Component.js`, we import the necessary functions
 ```javascript
-import RelieverRegistry from "react-redux-reliever"
+import RelieverRegistry, {connect} from "react-redux-reliever"
 ```
 
 The connect function takes two named parameters : `props` and `functions`
@@ -247,10 +239,9 @@ The connect function takes two named parameters : `props` and `functions`
     }
 ```
 
-`functions` is the same as `mapDispatchToProps` except that you have access to the whole state instead of the component's props.  
-This allows you to do checks or pass parameters based on the state without requiring to add them as props.
+`functions` is the same as `mapDispatchToProps` except that you have access to all the props returned by `props`.  
 ```javascript
-    functions(state, ownProps, dispatch) {
+    functions(ownProps, dispatch) {
         return {
             test: () => {
                 // Note that we generally don't use action creators.
@@ -267,9 +258,9 @@ This allows you to do checks or pass parameters based on the state without requi
 
 In the end, `connect` is used like that
 ```javascript
-export default RelieverRegistry.connect({
+export default connect({
     props: (state, ownProps) => {/* Your code here */},
-    functions: (state, ownProps, dispatch) => {/* Your code here */}
+    functions: (ownProps, dispatch) => {/* Your code here */}
 })(Component)
 ```
 
