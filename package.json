@@ -1,10 +1,9 @@
 {
   "name": "react-redux-reliever",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Stop opening four different files to code a simple feature when using redux",
   "main": "lib/index.js",
   "jsnext:main": "es/index.js",
-  "module": "src/index.js",
   "scripts": {
     "lint": "eslint src && eslint examples",
     "check": "echo \"checks disabled for now\"",
