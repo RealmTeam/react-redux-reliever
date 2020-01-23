@@ -3,9 +3,18 @@
 [![npm version](https://img.shields.io/npm/v/react-redux-reliever.svg?style=flat-square)](https://www.npmjs.com/package/react-redux-reliever)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
-`react-redux-reliever` is a simple package that aims to relieve you from the pain of opening multiple different files and write a lot of boring code each time you want to add a small feature when you're using react and redux.
+From redux's creator himself Dan Abramov :
 
-The principle is as follow : regroup all the logic from redux in a single file when you're developing new features while defaulting to certain behaviors to save you some time. You can easily override anything you don't like so you're not stuck either.
+> [Why is this stuff in five different files and constants SHOUTING at me](https://twitter.com/dan_abramov/status/1191487701058543617)
+
+
+`react-redux-reliever` is a simple package that aims to relieve you from the pain of
+opening multiple different files and write a lot of boring code each time you want to
+add a small feature in your React app.
+
+The principle is as follow : regroup all the logic from redux in a single file when
+you're developing new features while defaulting to certain behaviors to save you some
+time. You can easily override anything you don't like so you're not stuck either.
 
 It obviously uses [react](https://github.com/facebook/react) and [redux](https://github.com/reactjs/redux).
 
@@ -59,13 +68,15 @@ Create a class that extends `Reliever`
 class ComponentReliever extends Reliever {
 ```
 
-`ACTION_PREFIX` is used if you want to use the default behavior for the reducer which is to check if the action type starts with this prefix and merges the action payload (`action.payload = {}`) with the state if that's the case.  
+`ACTION_PREFIX` is used if you want to use the default behavior for the reducer which is
+to check if the action type starts with this prefix and merges the action payload
+(`action.payload = {}`) with the state if that's the case.  
 Leave it out if you don't wish to use the default behavior.
 ```javascript
     ACTION_PREFIX = 'WHATEVER'
 ```
 
-The initial state for the reducer. Note that it will be transformed to an [ImmutableJS](https://facebook.github.io/immutable-js/) object.
+The initial state for the reducer. Note that it will be transformed to a [SeamlessImmutable](https://github.com/rtfeldman/seamless-immutable) object.
 ```javascript
     getInitialState() {
         return {
@@ -75,7 +86,8 @@ The initial state for the reducer. Note that it will be transformed to an [Immut
 ```
 
 
-`getActions` is where you define actions that could be used by other containers (otherwise, simply use the payload)
+`getActions` is where you define actions that could be used by other containers
+(otherwise, simply use the payload)
 ```javascript
     getActions() {
         return {
@@ -85,14 +97,16 @@ The initial state for the reducer. Note that it will be transformed to an [Immut
     }
 ```
 
-The reducer is not required but you can still override it. Here we have a mix between the default `react-redux-reliever` behavior and the standard `redux` behavior.  
-Don't forget that the state is an [ImmutableJS](https://facebook.github.io/immutable-js/) object.  
-The most frequent case for a mixed reducer is something needing to be added to some value in the state.
+The reducer is not required but you can still override it. Here we have a mix between
+the default `react-redux-reliever` behavior and the standard `redux` behavior.  
+Don't forget that the state is a [SeamlessImmutable](https://github.com/rtfeldman/seamless-immutable/) object.  
+The most frequent case for a mixed reducer is something needing to be added to some
+value in the state.
 ```javascript
     reducer(state, action) {
         switch (action.type) {
             case 'WHATEVER_ADD':
-                return state.set('value', state.get('value') + "!")
+                return state.set('value', state.value + "!")
             default:
                 // Don't forget to call super
                 return super.reducer(state, action)
@@ -110,43 +124,44 @@ Create your `epics` (see [redux-observable](https://github.com/redux-observable/
 ```javascript
 
     import {Reliever} from 'react-redux-reliever'
-    import {Observable} from 'rxjs'
+    import {flatMap} from 'rxjs/operators'
+    import {defer, map, mapTo} from 'rxjs'
 
     class SomeReliever extends Reliever {
 
         someEpic(action$) {
             return action$
                 .ofType('WHATEVER_ACTION') // takes every action of type 'WHATEVER_ACTION' from the action stream
-                .mapTo({type: 'WHATEVER_UPDATE', payload: {value: 'foo'}}) // then maps the action to an action of type 'WHATEVER_UPDATE'. payload will be applied to the state automatically without using a reducer
+                .pipe(mapTo({type: 'WHATEVER_UPDATE', payload: {value: 'foo'}})) // then maps the action to an action of type 'WHATEVER_UPDATE'. payload will be applied to the state automatically without using a reducer
         }
 
         // you can also easily handle async actions
         someAsyncEpic(action$) {
             return action$
                 .ofType('WHATEVER_ACTION_ASYNC')
-                .flatMap(action => {
-                    return Observable
-                        .defer(async () => {
-                            const result = await fetch(`https://some-api.com/foo?userId=${action.userId}`)
-                            return await result.json()
-                        })
-                        .map(json => {
-                            return {
-                                type: 'WHATEVER_USER_DATA_FETCHED',
-                                payload: {
-                                    userData: json.foo
-                                }
-                            }
-                        })
-                })
+                .pipe(
+                  flatMap(action =>
+                    defer(async () => {
+                      const result = await fetch(`https://some-api.com/foo?userId=${action.userId}`)
+                      return await result.json()
+                    })
+                  ),
+                  map(json => ({
+                     type: 'WHATEVER_USER_DATA_FETCHED',
+                     payload: {
+                       userData: json.foo
+                     }
+                  }))
+                )
         }
     }
 ```
 
-`RxRelieverPlugin` also provides extensions for [rxjs](https://github.com/reactivex/rxjs) to provide you with convenient methods to access and observe the `store` and `state`
+`RxRelieverPlugin` also provides extensions for [rxjs](https://github.com/reactivex/rxjs)
+to provide you with convenient methods to access and observe the `store` and `state`
 ```javascript
     import {plugins} from 'react-redux-reliever'
-    const extensions = plugins.RxRelieverPlugin.instance.extensions()
+    const extensions = plugins.RxRelieverPlugin.extensions()
     extensions.getStore() // store observable, triggers once upon subscription
     extensions.getState() // state observable, triggers once upon subscription
     extensions.getState('substate') // substate observable, triggers once upon subscription
@@ -155,12 +170,13 @@ Create your `epics` (see [redux-observable](https://github.com/redux-observable/
     extensions.reduxActionStream() // returns the global action stream
 ```
 
-This allows you to build complex sequences of actions while leveraging the flexibility and operators of [rxjs](https://github.com/reactivex/rxjs)
+This allows you to build complex sequences of actions while leveraging the flexibility
+and operators of [rxjs](https://github.com/reactivex/rxjs)
 
 ```javascript
     fooEpic(action$) {
         const shouldStop$ = extensions.observeState('substate').pipe(
-            map(state => state.toJS().someProp),
+            map(state => state.toMutable().someProp),
             filter(prop => prop === 'foo'), // this observable will trigger when the property someProp === 'foo'
             take(1) // unsubscribe once the filter operator has triggered
         )
@@ -231,7 +247,8 @@ import RelieverRegistry, {connect} from "react-redux-reliever"
 
 The connect function takes two named parameters : `props` and `functions`
 
-`props` is exactly like `mapStateToProps` except that you also need to return `ownProps` (that way you are able to easily remove unwanted props)
+`props` is exactly like `mapStateToProps` except that you also need to return `ownProps`
+(that way you are able to easily remove unwanted props)
 ```javascript
     props(state, ownProps) {
         // moduleState is used to retrieve the module's state in the whole store

@@ -1,6 +1,6 @@
 /*eslint-disable no-unused-vars */
 import React from 'react'
-import RelieverRegistry from 'react-redux-reliever'
+import RelieverRegistry, {connect} from 'react-redux-reliever'
 
 const Counter = ({value, incr, incrAsync, decr, incrIfOdd, setToTen, startTimer}) => (
   <p>
@@ -10,9 +10,9 @@ const Counter = ({value, incr, incrAsync, decr, incrIfOdd, setToTen, startTimer}
   </p>
 )
 
-export default RelieverRegistry.connect({
+export default connect({
   props: (state, ownProps) => ({
-    value: RelieverRegistry.moduleState('counter', state).get('value'),
+    value: RelieverRegistry.moduleState('counter', state).value
   }),
   functions: (props, dispatch) => ({
     startTimer: () => {
@@ -35,4 +35,3 @@ export default RelieverRegistry.connect({
     }
   })
 })(Counter)
-

@@ -1,4 +1,4 @@
-import {fromJS} from 'immutable'
+import Immutable from 'seamless-immutable'
 import RelieverRegistry from './registry'
 import connect from './connect'
 import merger, {DEL, OVERWRITE} from './utils/merger'
@@ -17,8 +17,8 @@ class Reliever {
   }
 
   reducer(state, action) {
-    if (state === undefined) state = fromJS(this.getInitialState())
-    if (action.type.startsWith(this.ACTION_PREFIX + '_') && action.payload) return merger(state, fromJS(action.payload))
+    if (state === undefined) state = Immutable.from(this.getInitialState())
+    if (action.type.startsWith(this.ACTION_PREFIX + '_') && action.payload) return merger(state, Immutable.from(action.payload))
     return state
   }
 }

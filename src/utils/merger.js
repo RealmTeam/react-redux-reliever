@@ -1,4 +1,4 @@
-import {List, Map, isImmutable} from 'immutable'
+import Immutable from 'seamless-immutable'
 
 export const DEL = '__DEL__'
 export const OVERWRITE = '__OVERWRITE__'
@@ -7,37 +7,37 @@ export const OVERWRITE = '__OVERWRITE__'
 function isPlainObject(obj) {
   if (typeof obj == 'object' && obj !== null) {
     if (typeof Object.getPrototypeOf == 'function') {
-      var proto = Object.getPrototypeOf(obj);
-      return proto === Object.prototype || proto === null;
+      var proto = Object.getPrototypeOf(obj)
+      return proto === Object.prototype || proto === null
     }
-    return Object.prototype.toString.call(obj) == '[object Object]';
+    return Object.prototype.toString.call(obj) == '[object Object]'
   }
-  return false;
+  return false
 }
 
 export default function merger(a, b) {
   // Overwrite handling OVERWRITE
-  if (b && ((isPlainObject(b) && b[OVERWRITE]) || (isImmutable(b) && b.get(OVERWRITE)))) {
-    if (isImmutable(b)) b = b.delete(OVERWRITE)
+  if (b && isPlainObject(b) && b[OVERWRITE]) {
+    if (Immutable.isImmutable(b)) b = b.without(OVERWRITE)
     else delete b[OVERWRITE]
     return b
   }
 
   // Deletion handling DEL
-  if (a && (Map.isMap(a) || isPlainObject(a)) && b && (Map.isMap(b) || isPlainObject(b))) {
-    (isImmutable(b) ? b.entrySeq() : Object.entries(b)).forEach(([k, v]) => {
+  if (a && isPlainObject(a) && b && isPlainObject(b)) {
+    Object.entries(b).forEach(([k, v]) => {
       if (v === DEL) {
-        if (isImmutable(b)) b = b.delete(k)
+        if (Immutable.isImmutable(b)) b = b.without(k)
         else delete b[k]
-        if (isImmutable(a)) a = a.delete(k)
+        if (Immutable.isImmutable(a)) a = a.without(k)
         else delete a[k]
       }
     })
   }
 
   // Regular merge
-  if (a && a.mergeWith && !List.isList(a) && b !== null && (Map.isMap(b) || isPlainObject(b))) {
-    return a.mergeWith(merger, b)
+  if (a != null && Immutable.isImmutable(a) && !Array.isArray(a) && b != null && isPlainObject(b)) {
+    return Immutable.merge(a, b, {deep: true, merger})
   }
   return b
 }

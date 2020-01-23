@@ -1,17 +1,18 @@
 {
   "name": "react-redux-reliever",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Stop opening four different files to code a simple feature when using redux",
   "main": "lib/index.js",
   "jsnext:main": "es/index.js",
+  "module": "src/index.js",
   "scripts": {
     "lint": "eslint src && eslint examples",
     "check": "echo \"checks disabled for now\"",
-    "compile": "rimraf lib && cross-env BABEL_ENV=cjs babel -d lib/ src/",
-    "build:es": "cross-env BABEL_ENV=es babel src --out-dir es",
-    "build": "rimraf es && npm run build:es",
+    "compile": "rm -rf lib && BABEL_ENV=cjs babel -d lib/ src/",
+    "build:es": "BABEL_ENV=es babel src --out-dir es",
+    "build": "rm -rf es && npm run build:es",
     "prepublish": "npm run check && npm run compile && npm run build",
-    "counter": "cross-env BABEL_ENV=cjs node examples/counter/server.js"
+    "counter": "node examples/counter/server.js"
   },
   "repository": {
     "type": "git",
@@ -32,33 +33,45 @@
   "homepage": "https://github.com/RealmTeam/react-redux-reliever#readme",
   "dependencies": {
     "eslint-plugin-redux-reliever": "1.5.0",
-    "shallow-equal": "^1.2.0"
+    "seamless-immutable": "^7.1.4",
+    "shallow-equal": "^1.2.1"
   },
   "devDependencies": {
-    "babel-cli": "^6.1.18",
-    "babel-core": "^6.14.0",
-    "babel-eslint": "^6.0.3",
-    "babel-loader": "^6.2.5",
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-preset-es2015": "^6.24.1",
-    "babel-preset-react-app": "^3.0.3",
-    "babel-preset-stage-2": "^6.24.1",
-    "babel-runtime": "^6.23.0",
-    "cross-env": "^5.2.0",
-    "eslint": "^6.0.1",
+    "@babel/cli": "^7.8.3",
+    "@babel/core": "^7.8.3",
+    "@babel/plugin-proposal-class-properties": "^7.0.0",
+    "@babel/plugin-proposal-decorators": "^7.0.0",
+    "@babel/plugin-proposal-export-namespace-from": "^7.0.0",
+    "@babel/plugin-proposal-function-sent": "^7.0.0",
+    "@babel/plugin-proposal-json-strings": "^7.0.0",
+    "@babel/plugin-proposal-numeric-separator": "^7.0.0",
+    "@babel/plugin-proposal-throw-expressions": "^7.0.0",
+    "@babel/plugin-syntax-dynamic-import": "^7.0.0",
+    "@babel/plugin-syntax-import-meta": "^7.0.0",
+    "@babel/plugin-transform-flow-strip-types": "^7.8.3",
+    "@babel/plugin-transform-react-jsx": "^7.8.3",
+    "@babel/preset-env": "^7.8.3",
+    "@babel/preset-flow": "^7.8.3",
+    "@babel/preset-react": "^7.8.3",
+    "babel-loader": "^8.0.6",
+    "babel-polyfill": "^6.26.0",
+    "eslint": "^6.8.0",
     "express": "^4.16.1",
     "gitbook-cli": "2.3.2",
-    "lolex": "^4.1.0",
+    "lolex": "^5.1.2",
+    "prop-types": "^15.5.7",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-redux": "^7.1.0",
+    "redux": "^4.0.4",
     "redux-logger": "^3.0.6",
-    "rimraf": "^2.4.3",
-    "tap-spec": "^5.0.0",
-    "tape": "^4.2.2",
-    "webpack": "1.13.0",
-    "webpack-dev-middleware": "^1.4.0",
-    "webpack-hot-middleware": "^2.6.0"
+    "redux-observable": "^1.1.0",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-middleware": "^3.7.2",
+    "webpack-dev-server": "^3.10.1"
   },
   "peerDependencies": {
-    "immutable": "^4.0.0-rc.12",
     "prop-types": "^15.5.7",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
@@ -67,9 +80,9 @@
     "redux-observable": "^1.1.0"
   },
   "optionalDependencies": {
-    "redux-saga": "^0.16.0",
-    "rxjs": "^6.5.2",
-    "rxjs-compat": "^6.5.2"
+    "redux-saga": "^1.1.3",
+    "rxjs": "^6.5.4",
+    "rxjs-compat": "^6.5.4"
   },
   "npmName": "react-redux-reliever",
   "npmFileMap": [

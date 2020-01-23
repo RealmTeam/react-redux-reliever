@@ -59,7 +59,7 @@ export default class RxRelieverPlugin {
     return null
   }
 
-  extensions() {
+  static extensions() {
     const getStore = () => RxRelieverPlugin.instance.store$
     const getState = module => getStore().pipe(map(store => {
       const state = store.getState()

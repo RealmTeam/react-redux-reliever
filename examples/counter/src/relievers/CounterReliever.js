@@ -1,6 +1,9 @@
-import {Reliever} from 'react-redux-reliever'
-import {Observable} from 'rxjs'
+import {Reliever, plugins} from 'react-redux-reliever'
 import {takeLatest} from 'redux-saga/effects'
+import {map, mapTo, filter, takeUntil, delay, tap, flatMap} from 'rxjs/operators'
+import {timer, combineLatest} from 'rxjs'
+
+const {getStore, getState, reduxActionStream, observeState} = plugins.RxRelieverPlugin.extensions()
 
 class CounterReliever extends Reliever {
   ACTION_PREFIX = 'COUNTER'
@@ -20,47 +23,50 @@ class CounterReliever extends Reliever {
   }
 
   incrementEpic(action$) {
-    console.log(action$)
-    console.log(action$.ofType('COUNTER_INCREMENT'))
-    return action$.ofType('COUNTER_INCREMENT').flatMap(() => {
-      return Observable.getState('counter')
-        .map(x => x.toJS())
-        .map(({value}) => {
-          return {type: 'COUNTER_SET', payload: {value: value + 1}}
-        })
-    })
+    return action$.ofType('COUNTER_INCREMENT').pipe(
+      flatMap(() => {
+        return getState('counter').pipe(
+          map(x => x.asMutable()),
+          map(({value}) => ({type: 'COUNTER_SET', payload: {value: value + 1}}))
+        )
+      })
+    )
   }
 
   decrementEpic(action$) {
-    return action$.ofType('COUNTER_DECREMENT').flatMap(() => {
-      return Observable.getState('counter')
-        .map(x => x.toJS())
-        .map(({value}) => {
-          return {type: 'COUNTER_SET', payload: {value: value - 1}}
-        })
-    })
+    return action$.ofType('COUNTER_DECREMENT').pipe(
+      flatMap(() => {
+        return getState('counter').pipe(
+          map(x => x.asMutable()),
+          map(({value}) => ({type: 'COUNTER_SET', payload: {value: value - 1}}))
+        )
+      })
+    )
   }
 
   incrementAsyncEpic(action$) {
-    return action$
-      .ofType('COUNTER_INCREMENT_ASYNC')
-      .delay(500)
-      .do(() => console.log('some side effect')) // eslint-disable-line no-console
-      .delay(500)
-      .mapTo({type: 'COUNTER_INCREMENT'})
+    return action$.ofType('COUNTER_INCREMENT_ASYNC').pipe(
+      delay(500),
+      tap(() => console.log('some side effect')), // eslint-disable-line no-console
+      delay(500),
+      mapTo({type: 'COUNTER_INCREMENT'})
+    )
   }
 
   timerEpic(action$) {
-    return action$.ofType('COUNTER_START_TIMER').flatMap(() => {
-      const toValue = state => state.toJS().value
-      const startValue$ = Observable.getState('counter').map(toValue)
-      const currentValue$ = Observable.observeState('counter').map(toValue)
-      const counterHasIncremented10Times$ = Observable.combineLatest(startValue$, currentValue$).filter(([start, current]) => current - start >= 10)
+    return action$.ofType('COUNTER_START_TIMER').pipe(
+      flatMap(() => {
+        const toValue = state => state.getIn('value')
+        const startValue$ = getState('counter').pipe(map(toValue))
+        const currentValue$ = observeState('counter').pipe(map(toValue))
+        const counterHasIncremented10Times$ = combineLatest(startValue$, currentValue$).pipe(filter(([start, current]) => current - start >= 10))
 
-      return Observable.timer(0, 500)
-        .takeUntil(counterHasIncremented10Times$)
-        .mapTo({type: 'COUNTER_INCREMENT'})
-    })
+        return timer(0, 500).pipe(
+          takeUntil(counterHasIncremented10Times$),
+          mapTo({type: 'COUNTER_INCREMENT'})
+        )
+      })
+    )
   }
 
   getActions() {
