@@ -22,13 +22,24 @@ function isPlainObject(obj) {
   return false
 }
 
+function withoutOverwrite(obj) {
+  if (obj && isPlainObject(obj)) {
+    if (obj[OVERWRITE]) {
+      if (Immutable.isImmutable(obj)) obj = obj.without(OVERWRITE)
+      else delete b[OVERWRITE]
+    }
+    Object.entries(obj).filter(([k, v]) => isPlainObject(v)).forEach(([k, v]) => {
+       if (Immutable.isImmutable(obj)) obj = obj.set(k, withoutOverwrite(v))
+       else obj[k] = withoutOverwrite(v)
+    })
+  }
+  return obj
+}
+
 export default function merger(a, b) {
   // Overwrite handling OVERWRITE
-  if (b && isPlainObject(b) && b[OVERWRITE]) {
-    if (Immutable.isImmutable(b)) b = b.without(OVERWRITE)
-    else delete b[OVERWRITE]
-    return b
-  }
+  if (b && isPlainObject(b) && b[OVERWRITE])
+    return withoutOverwrite(b)
 
   // Deletion handling DEL
   if (a && isPlainObject(a) && b && isPlainObject(b)) {
@@ -47,5 +58,5 @@ export default function merger(a, b) {
       b != null && isPlainObject(b)) {
     return Immutable.merge(a, b, {deep: true, merger})
   }
-  return b
+  return withoutOverwrite(b)
 }
